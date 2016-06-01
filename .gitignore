@@ -1,0 +1,9 @@
+# Ignore intelliJ config
+.idea
+*.iml
+
+# Ignore build artifacts
+build/
+
+# Ignore test artifacts
+.coverage-reports
