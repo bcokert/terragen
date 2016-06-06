@@ -3,7 +3,7 @@ clean: ## Clean the project
 	mkdir ./build
 
 test: ## Run tests
-	go test -v ./...
+	go test ./...
 
 coverage: ## Generate test coverage
 	./bin/coverage.sh
