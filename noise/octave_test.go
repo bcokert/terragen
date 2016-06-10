@@ -38,7 +38,7 @@ func TestWhiteNoise1D(t *testing.T) {
 	}
 
 	for name, testCase := range testCases {
-		noiseFunction := noise.WhiteNoise1D(random.MockNormalFunction, testCase.Frequencies)
+		noiseFunction := noise.WhiteNoise1D(func() float64 { return 1 }, testCase.Frequencies)
 		for i, expected := range testCase.ExpectedResults {
 			if result := noiseFunction(testCase.InputParams[i]); math.Abs(result-expected) > 0.0000000000001 {
 				t.Errorf("%s failed. Expected result %d to be %v, received %v", name, i, expected, result)
@@ -77,7 +77,7 @@ func TestRedNoise1D(t *testing.T) {
 	}
 
 	for name, testCase := range testCases {
-		noiseFunction := noise.RedNoise1D(random.MockNormalFunction, testCase.Frequencies)
+		noiseFunction := noise.RedNoise1D(func() float64 { return 1 }, testCase.Frequencies)
 		for i, expected := range testCase.ExpectedResults {
 			if result := noiseFunction(testCase.InputParams[i]); math.Abs(result-expected) > 0.0000000000001 {
 				t.Errorf("%s failed. Expected result %d to be %v, received %v", name, i, expected, result)

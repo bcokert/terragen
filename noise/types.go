@@ -2,6 +2,9 @@ package noise
 
 //////// Noise Functions
 
+// Function1D represents a 1d noise function
+type Function1D func(t float64) float64
+
 // A Parametric1D is a Generic Noise function that returns some continuous noise
 type Parametric1D func(t float64) float64
 

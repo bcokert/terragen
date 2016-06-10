@@ -29,10 +29,14 @@ func TestSeededNormal(t *testing.T) {
 	}
 
 	for name, testCase := range testCases {
-		randomFunction := random.SeededNormal(testCase.Seed)
+		randomFunction1 := random.SeededNormal(testCase.Seed)
+		randomFunction2 := random.SeededNormal(testCase.Seed)
 		for i, expected := range testCase.ExpectedResults {
-			if result := randomFunction(); result != expected {
-				t.Errorf("%s failed. Expected case %d to be %v, received %v", name, i, expected, result)
+			if result := randomFunction1(); result != expected {
+				t.Errorf("%s failed. Expected randomFunciton1 case %d to be %v, received %v", name, i, expected, result)
+			}
+			if result := randomFunction2(); result != expected {
+				t.Errorf("%s failed. Expected randomFunciton2 case %d to be %v, received %v", name, i, expected, result)
 			}
 		}
 	}

@@ -1,0 +1,131 @@
+package controller
+
+import (
+	"fmt"
+	"net/http"
+	"net/url"
+	"strconv"
+
+	"github.com/bcokert/terragen/errors"
+	"github.com/bcokert/terragen/model"
+	"github.com/bcokert/terragen/noise"
+	"github.com/bcokert/terragen/random"
+)
+
+// Noise endpoint
+// GET: Applies the given noise function (or creates one from the given params), and returns the noise applied to the given range
+func (server *Server) Noise(response http.ResponseWriter, request *http.Request) {
+	queryParams := request.URL.Query()
+
+	switch request.Method {
+	case http.MethodGet:
+		var from, to []float64
+		var resolution int
+		var noiseFunction string
+		var err error
+		var jsonResponse []byte
+
+		if from, err = validateFrom(queryParams); err != nil {
+			errors.WriteError(response, errors.ErrorWithCause("Noise - Invalid 'from' param", err), http.StatusBadRequest)
+			return
+		}
+
+		if to, err = validateTo(queryParams); err != nil {
+			errors.WriteError(response, errors.ErrorWithCause("Noise - Invalid 'to' param", err), http.StatusBadRequest)
+			return
+		}
+
+		if resolution, err = validateResolution(queryParams); err != nil {
+			errors.WriteError(response, errors.ErrorWithCause("Noise - Invalid 'resolution' param", err), http.StatusBadRequest)
+			return
+		}
+
+		if noiseFunction, err = validateNoiseFunction(queryParams); err != nil {
+			errors.WriteError(response, errors.ErrorWithCause("Noise - Invalid 'noiseFunction' param", err), http.StatusBadRequest)
+			return
+		}
+
+		if jsonResponse, err = server.getNoise(from, to, resolution, noiseFunction, "", "", ""); err != nil {
+			errors.WriteError(response, errors.ErrorWithCause("Noise - Failed to generate noise", err), http.StatusInternalServerError)
+			return
+		}
+
+		response.Write(jsonResponse)
+	default:
+		errors.WriteError(response, fmt.Errorf("Noise - Unsupported http method '%s'", request.Method), http.StatusBadRequest)
+	}
+}
+
+func (server *Server) getNoise(from, to []float64, resolution int, noiseFunction, generator, transformer, synthesizer string) (output []byte, err error) {
+	response := model.NewNoise(noiseFunction)
+
+	// "Load" the correct preset noise function
+	var fn noise.Parametric1D
+	if noiseFunction == "white:1d" {
+		fn = noise.WhiteNoise1D(random.SeededNormal(server.Seed), []float64{1, 2, 4, 8})
+	} else if noiseFunction == "red:1d" {
+		fn = noise.RedNoise1D(random.SeededNormal(server.Seed), []float64{1, 2, 4, 8})
+	}
+
+	response.Generate(from, to, resolution, fn)
+
+	return server.Marshal(response)
+}
+
+func validateFrom(queryParams url.Values) (from []float64, err error) {
+	if from, err = ParseFloatArrayParam(queryParams, "from"); err != nil {
+		return []float64{}, fmt.Errorf("Illegal. Expected a list of numbers")
+	}
+
+	if len(from) == 0 {
+		return []float64{}, fmt.Errorf("Invalid. Must not be empty")
+	}
+
+	if len(from) > 1 {
+		return []float64{}, errors.UnsupportedError("Multiple dimensions")
+	}
+
+	return from, nil
+}
+
+func validateTo(queryParams url.Values) (to []float64, err error) {
+	if to, err = ParseFloatArrayParam(queryParams, "to"); err != nil {
+		return []float64{}, fmt.Errorf("Illegal. Expected a list of numbers")
+	}
+
+	if len(to) == 0 {
+		return []float64{}, fmt.Errorf("Invalid. Must not be empty")
+	}
+
+	if len(to) > 1 {
+		return []float64{}, errors.UnsupportedError("Multiple dimensions")
+	}
+
+	return to, nil
+}
+
+func validateResolution(queryParams url.Values) (resolution int, err error) {
+	if resolution, err = strconv.Atoi(queryParams.Get("resolution")); err != nil {
+		return 0, fmt.Errorf("Illegal. Expected an integer")
+	}
+
+	if resolution < 1 {
+		return 0, fmt.Errorf("Invalid. Must be greater than 0")
+	}
+
+	return resolution, nil
+}
+
+func validateNoiseFunction(queryParams url.Values) (noiseFunction string, err error) {
+	noiseFunction = queryParams.Get("noiseFunction")
+
+	if noiseFunction == "" {
+		return "", fmt.Errorf("Invalid. Expected a noise function preset or id")
+	}
+
+	if noiseFunction != "red:1d" && noiseFunction != "white:1d" {
+		return "", errors.UnsupportedError("Loading Noise Functions by Id")
+	}
+
+	return noiseFunction, nil
+}

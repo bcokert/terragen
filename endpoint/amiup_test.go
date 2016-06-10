@@ -5,6 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/bcokert/terragen/controller"
 	"github.com/bcokert/terragen/router"
 )
 
@@ -23,7 +24,7 @@ func TestAmiup(t *testing.T) {
 		request, _ := http.NewRequest(http.MethodGet, "/amiup", nil)
 		recorder := httptest.NewRecorder()
 
-		router := router.CreateDefaultRouter()
+		router := router.CreateDefaultRouter(&controller.Server{})
 		router.ServeHTTP(recorder, request)
 
 		if code := recorder.Code; code != testCase.ExpectedCode {
