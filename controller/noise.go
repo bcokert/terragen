@@ -17,6 +17,8 @@ import (
 func (server *Server) Noise(response http.ResponseWriter, request *http.Request) {
 	queryParams := request.URL.Query()
 
+	response.Header().Set("Access-Control-Allow-Origin", "*")
+
 	switch request.Method {
 	case http.MethodGet:
 		var from, to []float64
