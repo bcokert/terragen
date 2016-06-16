@@ -1,6 +1,6 @@
 package model
 
-import "github.com/bcokert/terragen/noise"
+import "github.com/bcokert/terragen/noisefunction"
 
 // Noise represents generated noise, typically from GetNoise
 type Noise struct {
@@ -19,7 +19,7 @@ func NewNoise(noiseFunction string) *Noise {
 }
 
 // Generate populates the RawNoise and related fields of this noise, by iterating over the range and calling the given noise function
-func (noise *Noise) Generate(from, to []float64, resolution int, noiseFunction noise.Parametric1D) {
+func (noise *Noise) Generate(from, to []float64, resolution int, noiseFunction noisefunction.Function1D) {
 	noise.RawNoise = map[string][]float64{}
 
 	numSamples := int(to[0]-from[0]+1) * resolution

@@ -1,12 +1,12 @@
-package random_test
+package generator_test
 
 import (
 	"testing"
 
-	"github.com/bcokert/terragen/random"
+	"github.com/bcokert/terragen/generator"
 )
 
-func TestSeededNormal(t *testing.T) {
+func TestRandom(t *testing.T) {
 	testCases := map[string]struct {
 		Seed            int64
 		ExpectedResults [10]float64
@@ -29,13 +29,13 @@ func TestSeededNormal(t *testing.T) {
 	}
 
 	for name, testCase := range testCases {
-		randomFunction1 := random.SeededNormal(testCase.Seed)
-		randomFunction2 := random.SeededNormal(testCase.Seed)
+		randomFunction1 := generator.Random(testCase.Seed)
+		randomFunction2 := generator.Random(testCase.Seed)
 		for i, expected := range testCase.ExpectedResults {
-			if result := randomFunction1(); result != expected {
+			if result := randomFunction1(1); result != expected {
 				t.Errorf("%s failed. Expected randomFunciton1 case %d to be %v, received %v", name, i, expected, result)
 			}
-			if result := randomFunction2(); result != expected {
+			if result := randomFunction2(1); result != expected {
 				t.Errorf("%s failed. Expected randomFunciton2 case %d to be %v, received %v", name, i, expected, result)
 			}
 		}

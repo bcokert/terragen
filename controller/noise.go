@@ -7,9 +7,10 @@ import (
 	"strconv"
 
 	"github.com/bcokert/terragen/errors"
+	"github.com/bcokert/terragen/generator"
 	"github.com/bcokert/terragen/model"
-	"github.com/bcokert/terragen/noise"
-	"github.com/bcokert/terragen/random"
+	"github.com/bcokert/terragen/noisefunction"
+	"github.com/bcokert/terragen/presets"
 )
 
 // Noise endpoint
@@ -58,15 +59,15 @@ func (server *Server) Noise(response http.ResponseWriter, request *http.Request)
 	}
 }
 
-func (server *Server) getNoise(from, to []float64, resolution int, noiseFunction, generator, transformer, synthesizer string) (output []byte, err error) {
+func (server *Server) getNoise(from, to []float64, resolution int, noiseFunction, gen, transformer, synthesizer string) (output []byte, err error) {
 	response := model.NewNoise(noiseFunction)
 
 	// "Load" the correct preset noise function
-	var fn noise.Parametric1D
+	var fn noisefunction.Function1D
 	if noiseFunction == "white:1d" {
-		fn = noise.WhiteNoise1D(random.SeededNormal(server.Seed), []float64{1, 2, 4, 8})
+		fn = presets.WhiteNoise1D(generator.Random(server.Seed), []float64{1, 2, 4, 8})
 	} else if noiseFunction == "red:1d" {
-		fn = noise.RedNoise1D(random.SeededNormal(server.Seed), []float64{1, 2, 4, 8})
+		fn = presets.RedNoise1D(generator.Random(server.Seed), []float64{1, 2, 4, 8})
 	}
 
 	response.Generate(from, to, resolution, fn)
