@@ -4,83 +4,66 @@ import (
 	"math"
 	"testing"
 
+	"github.com/bcokert/terragen/generator"
+	"github.com/bcokert/terragen/noise"
 	"github.com/bcokert/terragen/presets"
+	"github.com/bcokert/terragen/synthesizer"
+	"github.com/bcokert/terragen/transformer"
 )
 
-func TestWhiteNoise1D(t *testing.T) {
+func testSpectra1D(t *testing.T, preset presets.Spectral1DPreset, weightExponent float64) {
 	testCases := map[string]struct {
-		InputParams     []float64
-		Frequencies     []float64
-		ExpectedResults []float64
+		InputParams []float64
+		Frequencies []float64
 	}{
 		"one frequency": {
 			InputParams: []float64{-1, 0, 1, 1.5, 2, 50},
 			Frequencies: []float64{1},
-			ExpectedResults: []float64{
-				math.Sin(2*math.Pi*1*-1 + 1),
-				math.Sin(2*math.Pi*1*0 + 1),
-				math.Sin(2*math.Pi*1*1 + 1),
-				math.Sin(2*math.Pi*1*1.5 + 1),
-				math.Sin(2*math.Pi*1*2 + 1),
-				math.Sin(2*math.Pi*1*50 + 1),
-			},
 		},
 		"multi frequency": {
 			InputParams: []float64{-1, 0, 1},
 			Frequencies: []float64{1, 2, 3},
-			ExpectedResults: []float64{
-				math.Sin(2*math.Pi*1*-1+1)/3 + math.Sin(2*math.Pi*1*-1+1)/3 + math.Sin(2*math.Pi*3*-1+1)/3,
-				math.Sin(2*math.Pi*1*0+1)/3 + math.Sin(2*math.Pi*2*0+1)/3 + math.Sin(2*math.Pi*3*0+1)/3,
-				math.Sin(2*math.Pi*1*1+1)/3 + math.Sin(2*math.Pi*2*1+1)/3 + math.Sin(2*math.Pi*3*1+1)/3,
-			},
 		},
 	}
 
 	for name, testCase := range testCases {
-		noiseFunction := presets.WhiteNoise1D(func(t float64) float64 { return 1 }, testCase.Frequencies)
-		for i, expected := range testCase.ExpectedResults {
-			if result := noiseFunction(testCase.InputParams[i]); math.Abs(result-expected) > 0.0000000000001 {
-				t.Errorf("%s failed. Expected result %d to be %v, received %v", name, i, expected, result)
+		expectedGeneratorFn := generator.Random(42)
+		expectedNoiseFnGenerator := func(freq float64) noise.Function1D {
+			return transformer.Sinusoid1D(expectedGeneratorFn, freq)
+		}
+		expectedWeightFn := func(freq float64) float64 {
+			return math.Pow(freq, weightExponent)
+		}
+		expectedSynthesizerFn := synthesizer.Octave1D(expectedNoiseFnGenerator, expectedWeightFn, testCase.Frequencies)
+
+		noiseFunction := preset(42, testCase.Frequencies)
+
+		for _, param := range testCase.InputParams {
+			expected := expectedSynthesizerFn(param)
+			result := noiseFunction(param)
+			if math.Abs(result-expected) > 0.0000000000001 {
+				t.Errorf("%s failed. Expected param %v to result in %v, received %v", name, param, expected, result)
 			}
 		}
 	}
 }
 
-func TestRedNoise1D(t *testing.T) {
-	testCases := map[string]struct {
-		InputParams     []float64
-		Frequencies     []float64
-		ExpectedResults []float64
-	}{
-		"one frequency": {
-			InputParams: []float64{-1, 0, 1, 1.5, 2, 50},
-			Frequencies: []float64{1},
-			ExpectedResults: []float64{
-				math.Sin(2*math.Pi*1*-1 + 1),
-				math.Sin(2*math.Pi*1*0 + 1),
-				math.Sin(2*math.Pi*1*1 + 1),
-				math.Sin(2*math.Pi*1*1.5 + 1),
-				math.Sin(2*math.Pi*1*2 + 1),
-				math.Sin(2*math.Pi*1*50 + 1),
-			},
-		},
-		"multi frequency": {
-			InputParams: []float64{-1, 0, 1},
-			Frequencies: []float64{1, 2, 3},
-			ExpectedResults: []float64{
-				math.Sin(2*math.Pi*1*-1+1)/3 + math.Sin(2*math.Pi*1*-1+1)/12 + math.Sin(2*math.Pi*3*-1+1)/27,
-				math.Sin(2*math.Pi*1*0+1)/3 + math.Sin(2*math.Pi*2*0+1)/12 + math.Sin(2*math.Pi*3*0+1)/27,
-				math.Sin(2*math.Pi*1*1+1)/3 + math.Sin(2*math.Pi*2*1+1)/12 + math.Sin(2*math.Pi*3*1+1)/27,
-			},
-		},
-	}
+func TestViolet1D(t *testing.T) {
+	testSpectra1D(t, presets.Violet1D, 2)
+}
 
-	for name, testCase := range testCases {
-		noiseFunction := presets.RedNoise1D(func(t float64) float64 { return 1 }, testCase.Frequencies)
-		for i, expected := range testCase.ExpectedResults {
-			if result := noiseFunction(testCase.InputParams[i]); math.Abs(result-expected) > 0.0000000000001 {
-				t.Errorf("%s failed. Expected result %d to be %v, received %v", name, i, expected, result)
-			}
-		}
-	}
+func TestBlue1D(t *testing.T) {
+	testSpectra1D(t, presets.Blue1D, 1)
+}
+
+func TestWhite1D(t *testing.T) {
+	testSpectra1D(t, presets.White1D, 0)
+}
+
+func TestPink1D(t *testing.T) {
+	testSpectra1D(t, presets.Pink1D, -1)
+}
+
+func TestRed1D(t *testing.T) {
+	testSpectra1D(t, presets.Red1D, -2)
 }

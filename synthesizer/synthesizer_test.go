@@ -4,21 +4,21 @@ import (
 	"math"
 	"testing"
 
-	"github.com/bcokert/terragen/noisefunction"
+	"github.com/bcokert/terragen/noise"
 	"github.com/bcokert/terragen/synthesizer"
 )
 
 func TestOctave1D(t *testing.T) {
 	testCases := map[string]struct {
 		InputParams     []float64
-		Generator       func(freq float64) noisefunction.Function1D
+		Generator       func(freq float64) noise.Function1D
 		WeightFunction  func(freq float64) float64
 		Frequencies     []float64
 		ExpectedResults []float64
 	}{
 		"constant function and weight, 2 frequencies": {
 			InputParams: []float64{-1, 0, 500},
-			Generator: func(freq float64) noisefunction.Function1D {
+			Generator: func(freq float64) noise.Function1D {
 				return func(t float64) float64 {
 					return 4
 				}
@@ -35,7 +35,7 @@ func TestOctave1D(t *testing.T) {
 		},
 		"basic function and weight, 3 frequencies": {
 			InputParams: []float64{-1, 0, 500},
-			Generator: func(freq float64) noisefunction.Function1D {
+			Generator: func(freq float64) noise.Function1D {
 				return func(t float64) float64 {
 					return freq + t
 				}

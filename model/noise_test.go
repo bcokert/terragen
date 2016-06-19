@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/bcokert/terragen/model"
-	"github.com/bcokert/terragen/noisefunction"
+	"github.com/bcokert/terragen/noise"
 	"github.com/bcokert/terragen/testutils"
 )
 
@@ -34,7 +34,7 @@ func TestGenerate(t *testing.T) {
 		From          []float64
 		To            []float64
 		Resolution    int
-		NoiseFunction noisefunction.Function1D
+		NoiseFunction noise.Function1D
 		Expected      model.Noise
 	}{
 		"basic 1d": {
