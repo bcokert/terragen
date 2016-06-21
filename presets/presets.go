@@ -9,6 +9,15 @@ import (
 	"github.com/bcokert/terragen/transformer"
 )
 
+// SpectralPresets is a map from preset names to spectral noise functions
+var SpectralPresets map[string]func(int64, []float64) noise.Function1D = map[string]func(int64, []float64) noise.Function1D{
+	"violet:1d": Violet1D,
+	"blue:1d":   Blue1D,
+	"white:1d":  White1D,
+	"pink:1d":   Pink1D,
+	"red:1d":    Red1D,
+}
+
 // A Spectral1DPreset creates octave noise functions with randomly phased sinusoidal noise functions.
 // It combines octaves proportional to their frequencies, using a function f^X, where X is the weightExponent and corresponds to a normalized electromagnetic spectrum
 // 2 = violet, 1 = blue, 0 = white, -1 = pink, -2 = red

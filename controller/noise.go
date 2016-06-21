@@ -8,7 +8,6 @@ import (
 
 	"github.com/bcokert/terragen/errors"
 	"github.com/bcokert/terragen/model"
-	"github.com/bcokert/terragen/noise"
 	"github.com/bcokert/terragen/presets"
 )
 
@@ -61,15 +60,7 @@ func (server *Server) Noise(response http.ResponseWriter, request *http.Request)
 func (server *Server) getNoise(from, to []float64, resolution int, noiseFunction, gen, transformer, synthesizer string) (output []byte, err error) {
 	response := model.NewNoise(noiseFunction)
 
-	// "Load" the correct preset noise function
-	var fn noise.Function1D
-	if noiseFunction == "white:1d" {
-		fn = presets.White1D(server.Seed, []float64{1, 2, 4, 8})
-	} else if noiseFunction == "red:1d" {
-		fn = presets.Red1D(server.Seed, []float64{1, 2, 4, 8})
-	}
-
-	response.Generate(from, to, resolution, fn)
+	response.Generate(from, to, resolution, presets.SpectralPresets[noiseFunction](server.Seed, []float64{1, 2, 4, 8}))
 
 	return server.Marshal(response)
 }
@@ -125,9 +116,11 @@ func validateNoiseFunction(queryParams url.Values) (noiseFunction string, err er
 		return "", fmt.Errorf("Invalid. Expected a noise function preset or id")
 	}
 
-	if noiseFunction != "red:1d" && noiseFunction != "white:1d" {
-		return "", errors.UnsupportedError("Loading Noise Functions by Id")
+	for noiseFn, _ := range presets.SpectralPresets {
+		if noiseFunction == noiseFn {
+			return noiseFunction, nil
+		}
 	}
 
-	return noiseFunction, nil
+	return "", errors.UnsupportedError("Loading Noise Functions by Id")
 }
