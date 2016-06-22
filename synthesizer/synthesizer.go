@@ -13,7 +13,7 @@ func Octave1D(noiseFnGenerator NoiseFunctionGenerator, weightFn WeightFunction, 
 	var noiseFunctions []noise.Function1D
 	for _, freq := range frequencies {
 		freqFn := noiseFnGenerator(freq)
-		weight := weightFn(freq) / float64(len(frequencies))
+		weight := weightFn(freq)
 		noiseFunctions = append(noiseFunctions, func(t float64) float64 {
 			return freqFn(t) * weight
 		})

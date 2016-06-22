@@ -376,7 +376,7 @@ func TestGetNoise_Success(t *testing.T) {
 		}
 		response := testutils.ExecuteTestRequest(router.CreateDefaultRouter(server), http.MethodGet, testCase.Url, nil)
 
-		expectedNoiseFunction := presets.SpectralPresets[testCase.ExpectedResponse.NoiseFunction](42, []float64{1, 2, 4, 8})
+		expectedNoiseFunction := presets.SpectralPresets[testCase.ExpectedResponse.NoiseFunction](42, []float64{1, 2, 4, 8, 16, 32, 64})
 		testCase.ExpectedResponse.RawNoise["value"] = []float64{}
 		for _, x := range testCase.ExpectedResponse.RawNoise["x"] {
 			testCase.ExpectedResponse.RawNoise["value"] = append(testCase.ExpectedResponse.RawNoise["value"], expectedNoiseFunction(x))
