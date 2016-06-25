@@ -49,7 +49,7 @@ func Red1D(seed int64, frequencies []float64) noise.Function1D {
 }
 
 func spectral1D(seed int64, frequencies synthesizer.Frequencies, weightExponent float64) noise.Function1D {
-	phaseFn := generator.Random(seed)
+	phaseFn := generator.Random1D(seed)
 
 	weightFn := func(frequency float64) float64 {
 		return math.Pow(frequency, weightExponent)

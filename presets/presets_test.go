@@ -27,7 +27,7 @@ func testSpectra1D(t *testing.T, preset presets.Spectral1DPreset, weightExponent
 	}
 
 	for name, testCase := range testCases {
-		expectedGeneratorFn := generator.Random(42)
+		expectedGeneratorFn := generator.Random1D(42)
 		expectedNoiseFnGenerator := func(freq float64) noise.Function1D {
 			return transformer.Sinusoid1D(expectedGeneratorFn, freq)
 		}
