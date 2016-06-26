@@ -60,7 +60,7 @@ func TestSinusoid2D(t *testing.T) {
 		PhaseFn     noise.Function2D
 		Frequency   float64
 		InputParams [][2]float64
-		ExpectedFn  func(tx, ty float64) float64
+		ExpectedFn  noise.Function2D
 	}{
 		"constant phase function": {
 			PhaseFn: func(tx, ty float64) float64 {
