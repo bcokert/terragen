@@ -16,7 +16,7 @@ func TestTrack(t *testing.T) {
 	}{
 		"12 Ms": {
 			StartTime:        time.Now().Add(-12 * 1000000),
-			ExpectedLogRegex: `INFO test track took 12\.\d*ms`,
+			ExpectedLogRegex: `INFO: test track took 12\.\d*ms`,
 		},
 		"2 hours": {
 			StartTime:        time.Now().Add(-2 * 3600000000000),
