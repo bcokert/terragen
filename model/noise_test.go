@@ -5,7 +5,6 @@ import (
 
 	"github.com/bcokert/terragen/model"
 	"github.com/bcokert/terragen/noise"
-	"github.com/bcokert/terragen/testutils"
 )
 
 func TestNewNoise(t *testing.T) {
@@ -46,8 +45,8 @@ func TestGenerate(t *testing.T) {
 			},
 			Expected: model.Noise{
 				RawNoise: map[string][]float64{
-					"t1":    testutils.FloatSlice(1, 3, 4),
-					"value": testutils.FloatSlice(1, 3, 4),
+					"t1":    []float64{1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75},
+					"value": []float64{1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75},
 				},
 				From:       []float64{1},
 				To:         []float64{3},

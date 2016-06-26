@@ -199,14 +199,14 @@ func TestGetNoise_Success(t *testing.T) {
 			ExpectedCode: http.StatusOK,
 		},
 		"violet1d large resolution": {
-			Url: "/noise?from=0&to=1&resolution=50&noiseFunction=violet:1d",
+			Url: "/noise?from=0&to=1&resolution=25&noiseFunction=violet:1d",
 			ExpectedResponse: model.Noise{
 				RawNoise: map[string][]float64{
-					"t1": testutils.FloatSlice(0, 1, 50),
+					"t1": []float64{0, 0.04, 0.08, 0.12, 0.16, 0.2, 0.24, 0.28, 0.32, 0.36, 0.4, 0.44, 0.48, 0.52, 0.56, 0.6, 0.64, 0.68, 0.72, 0.76, 0.8, 0.84, 0.88, 0.92, 0.96},
 				},
 				From:          []float64{0},
 				To:            []float64{1},
-				Resolution:    50,
+				Resolution:    25,
 				NoiseFunction: "violet:1d",
 			},
 			ExpectedCode: http.StatusOK,
@@ -238,14 +238,14 @@ func TestGetNoise_Success(t *testing.T) {
 			ExpectedCode: http.StatusOK,
 		},
 		"blue1d large resolution": {
-			Url: "/noise?from=0&to=1&resolution=50&noiseFunction=blue:1d",
+			Url: "/noise?from=0&to=1&resolution=25&noiseFunction=blue:1d",
 			ExpectedResponse: model.Noise{
 				RawNoise: map[string][]float64{
-					"t1": testutils.FloatSlice(0, 1, 50),
+					"t1": []float64{0, 0.04, 0.08, 0.12, 0.16, 0.2, 0.24, 0.28, 0.32, 0.36, 0.4, 0.44, 0.48, 0.52, 0.56, 0.6, 0.64, 0.68, 0.72, 0.76, 0.8, 0.84, 0.88, 0.92, 0.96},
 				},
 				From:          []float64{0},
 				To:            []float64{1},
-				Resolution:    50,
+				Resolution:    25,
 				NoiseFunction: "blue:1d",
 			},
 			ExpectedCode: http.StatusOK,
@@ -277,14 +277,14 @@ func TestGetNoise_Success(t *testing.T) {
 			ExpectedCode: http.StatusOK,
 		},
 		"white1d large resolution": {
-			Url: "/noise?from=0&to=1&resolution=50&noiseFunction=white:1d",
+			Url: "/noise?from=0&to=1&resolution=25&noiseFunction=white:1d",
 			ExpectedResponse: model.Noise{
 				RawNoise: map[string][]float64{
-					"t1": testutils.FloatSlice(0, 1, 50),
+					"t1": []float64{0, 0.04, 0.08, 0.12, 0.16, 0.2, 0.24, 0.28, 0.32, 0.36, 0.4, 0.44, 0.48, 0.52, 0.56, 0.6, 0.64, 0.68, 0.72, 0.76, 0.8, 0.84, 0.88, 0.92, 0.96},
 				},
 				From:          []float64{0},
 				To:            []float64{1},
-				Resolution:    50,
+				Resolution:    25,
 				NoiseFunction: "white:1d",
 			},
 			ExpectedCode: http.StatusOK,
@@ -316,14 +316,14 @@ func TestGetNoise_Success(t *testing.T) {
 			ExpectedCode: http.StatusOK,
 		},
 		"pink1d large resolution": {
-			Url: "/noise?from=0&to=1&resolution=50&noiseFunction=pink:1d",
+			Url: "/noise?from=0&to=1&resolution=25&noiseFunction=pink:1d",
 			ExpectedResponse: model.Noise{
 				RawNoise: map[string][]float64{
-					"t1": testutils.FloatSlice(0, 1, 50),
+					"t1": []float64{0, 0.04, 0.08, 0.12, 0.16, 0.2, 0.24, 0.28, 0.32, 0.36, 0.4, 0.44, 0.48, 0.52, 0.56, 0.6, 0.64, 0.68, 0.72, 0.76, 0.8, 0.84, 0.88, 0.92, 0.96},
 				},
 				From:          []float64{0},
 				To:            []float64{1},
-				Resolution:    50,
+				Resolution:    25,
 				NoiseFunction: "pink:1d",
 			},
 			ExpectedCode: http.StatusOK,
@@ -355,14 +355,14 @@ func TestGetNoise_Success(t *testing.T) {
 			ExpectedCode: http.StatusOK,
 		},
 		"red1d large resolution": {
-			Url: "/noise?from=0&to=1&resolution=50&noiseFunction=red:1d",
+			Url: "/noise?from=0&to=1&resolution=25&noiseFunction=red:1d",
 			ExpectedResponse: model.Noise{
 				RawNoise: map[string][]float64{
-					"t1": testutils.FloatSlice(0, 1, 50),
+					"t1": []float64{0, 0.04, 0.08, 0.12, 0.16, 0.2, 0.24, 0.28, 0.32, 0.36, 0.4, 0.44, 0.48, 0.52, 0.56, 0.6, 0.64, 0.68, 0.72, 0.76, 0.8, 0.84, 0.88, 0.92, 0.96},
 				},
 				From:          []float64{0},
 				To:            []float64{1},
-				Resolution:    50,
+				Resolution:    25,
 				NoiseFunction: "red:1d",
 			},
 			ExpectedCode: http.StatusOK,
