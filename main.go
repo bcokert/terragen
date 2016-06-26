@@ -3,6 +3,8 @@ package main
 import (
 	"net/http"
 
+	stdLog "log"
+
 	"github.com/bcokert/terragen/controller"
 	"github.com/bcokert/terragen/log"
 	"github.com/bcokert/terragen/router"
@@ -13,5 +15,5 @@ func main() {
 
 	server := controller.CreateDefaultServer()
 	r := router.CreateDefaultRouter(server)
-	log.Fatal(http.ListenAndServe("localhost:8080/", r))
+	stdLog.Fatal(http.ListenAndServe("localhost:8080/", r))
 }
