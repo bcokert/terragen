@@ -176,7 +176,7 @@ func TestGetNoise_Success(t *testing.T) {
 			Url: "/noise?from=0&to=10&resolution=2&noiseFunction=violet:1d",
 			ExpectedResponse: model.Noise{
 				RawNoise: map[string][]float64{
-					"x": []float64{0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5},
+					"t1": []float64{0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5},
 				},
 				From:          []float64{0},
 				To:            []float64{10},
@@ -189,7 +189,7 @@ func TestGetNoise_Success(t *testing.T) {
 			Url: "/noise?from=0&to=0&resolution=2&noiseFunction=violet:1d",
 			ExpectedResponse: model.Noise{
 				RawNoise: map[string][]float64{
-					"x": []float64{},
+					"t1": []float64{},
 				},
 				From:          []float64{0},
 				To:            []float64{0},
@@ -202,7 +202,7 @@ func TestGetNoise_Success(t *testing.T) {
 			Url: "/noise?from=0&to=1&resolution=50&noiseFunction=violet:1d",
 			ExpectedResponse: model.Noise{
 				RawNoise: map[string][]float64{
-					"x": testutils.FloatSlice(0, 1, 50),
+					"t1": testutils.FloatSlice(0, 1, 50),
 				},
 				From:          []float64{0},
 				To:            []float64{1},
@@ -215,7 +215,7 @@ func TestGetNoise_Success(t *testing.T) {
 			Url: "/noise?from=0&to=10&resolution=2&noiseFunction=blue:1d",
 			ExpectedResponse: model.Noise{
 				RawNoise: map[string][]float64{
-					"x": []float64{0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5},
+					"t1": []float64{0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5},
 				},
 				From:          []float64{0},
 				To:            []float64{10},
@@ -228,7 +228,7 @@ func TestGetNoise_Success(t *testing.T) {
 			Url: "/noise?from=0&to=0&resolution=2&noiseFunction=blue:1d",
 			ExpectedResponse: model.Noise{
 				RawNoise: map[string][]float64{
-					"x": []float64{},
+					"t1": []float64{},
 				},
 				From:          []float64{0},
 				To:            []float64{0},
@@ -241,7 +241,7 @@ func TestGetNoise_Success(t *testing.T) {
 			Url: "/noise?from=0&to=1&resolution=50&noiseFunction=blue:1d",
 			ExpectedResponse: model.Noise{
 				RawNoise: map[string][]float64{
-					"x": testutils.FloatSlice(0, 1, 50),
+					"t1": testutils.FloatSlice(0, 1, 50),
 				},
 				From:          []float64{0},
 				To:            []float64{1},
@@ -254,7 +254,7 @@ func TestGetNoise_Success(t *testing.T) {
 			Url: "/noise?from=0&to=10&resolution=2&noiseFunction=white:1d",
 			ExpectedResponse: model.Noise{
 				RawNoise: map[string][]float64{
-					"x": []float64{0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5},
+					"t1": []float64{0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5},
 				},
 				From:          []float64{0},
 				To:            []float64{10},
@@ -267,7 +267,7 @@ func TestGetNoise_Success(t *testing.T) {
 			Url: "/noise?from=0&to=0&resolution=2&noiseFunction=white:1d",
 			ExpectedResponse: model.Noise{
 				RawNoise: map[string][]float64{
-					"x": []float64{},
+					"t1": []float64{},
 				},
 				From:          []float64{0},
 				To:            []float64{0},
@@ -280,7 +280,7 @@ func TestGetNoise_Success(t *testing.T) {
 			Url: "/noise?from=0&to=1&resolution=50&noiseFunction=white:1d",
 			ExpectedResponse: model.Noise{
 				RawNoise: map[string][]float64{
-					"x": testutils.FloatSlice(0, 1, 50),
+					"t1": testutils.FloatSlice(0, 1, 50),
 				},
 				From:          []float64{0},
 				To:            []float64{1},
@@ -293,7 +293,7 @@ func TestGetNoise_Success(t *testing.T) {
 			Url: "/noise?from=0&to=10&resolution=2&noiseFunction=pink:1d",
 			ExpectedResponse: model.Noise{
 				RawNoise: map[string][]float64{
-					"x": []float64{0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5},
+					"t1": []float64{0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5},
 				},
 				From:          []float64{0},
 				To:            []float64{10},
@@ -306,7 +306,7 @@ func TestGetNoise_Success(t *testing.T) {
 			Url: "/noise?from=0&to=0&resolution=2&noiseFunction=pink:1d",
 			ExpectedResponse: model.Noise{
 				RawNoise: map[string][]float64{
-					"x": []float64{},
+					"t1": []float64{},
 				},
 				From:          []float64{0},
 				To:            []float64{0},
@@ -319,7 +319,7 @@ func TestGetNoise_Success(t *testing.T) {
 			Url: "/noise?from=0&to=1&resolution=50&noiseFunction=pink:1d",
 			ExpectedResponse: model.Noise{
 				RawNoise: map[string][]float64{
-					"x": testutils.FloatSlice(0, 1, 50),
+					"t1": testutils.FloatSlice(0, 1, 50),
 				},
 				From:          []float64{0},
 				To:            []float64{1},
@@ -332,7 +332,7 @@ func TestGetNoise_Success(t *testing.T) {
 			Url: "/noise?from=0&to=10&resolution=2&noiseFunction=red:1d",
 			ExpectedResponse: model.Noise{
 				RawNoise: map[string][]float64{
-					"x": []float64{0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5},
+					"t1": []float64{0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5},
 				},
 				From:          []float64{0},
 				To:            []float64{10},
@@ -345,7 +345,7 @@ func TestGetNoise_Success(t *testing.T) {
 			Url: "/noise?from=0&to=0&resolution=2&noiseFunction=red:1d",
 			ExpectedResponse: model.Noise{
 				RawNoise: map[string][]float64{
-					"x": []float64{},
+					"t1": []float64{},
 				},
 				From:          []float64{0},
 				To:            []float64{0},
@@ -358,7 +358,7 @@ func TestGetNoise_Success(t *testing.T) {
 			Url: "/noise?from=0&to=1&resolution=50&noiseFunction=red:1d",
 			ExpectedResponse: model.Noise{
 				RawNoise: map[string][]float64{
-					"x": testutils.FloatSlice(0, 1, 50),
+					"t1": testutils.FloatSlice(0, 1, 50),
 				},
 				From:          []float64{0},
 				To:            []float64{1},
@@ -378,7 +378,7 @@ func TestGetNoise_Success(t *testing.T) {
 
 		expectedNoiseFunction := presets.Spectral1DPresets[testCase.ExpectedResponse.NoiseFunction](42, []float64{1, 2, 4, 8, 16, 32, 64})
 		testCase.ExpectedResponse.RawNoise["value"] = []float64{}
-		for _, x := range testCase.ExpectedResponse.RawNoise["x"] {
+		for _, x := range testCase.ExpectedResponse.RawNoise["t1"] {
 			testCase.ExpectedResponse.RawNoise["value"] = append(testCase.ExpectedResponse.RawNoise["value"], expectedNoiseFunction(x))
 		}
 

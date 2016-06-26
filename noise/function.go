@@ -38,6 +38,9 @@ var Standard2DInputParams = [][2]float64{
 	[2]float64{-33234, 0.0001},
 }
 
+// Function is an n dimensional noise function
+type Function func(t []float64) float64
+
 // Function1D represents a 1d noise function
 type Function1D func(t float64) float64
 

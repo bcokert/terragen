@@ -34,24 +34,47 @@ func TestGenerate(t *testing.T) {
 		From          []float64
 		To            []float64
 		Resolution    int
-		NoiseFunction noise.Function1D
+		NoiseFunction noise.Function
 		Expected      model.Noise
 	}{
 		"basic 1d": {
 			From:       []float64{1},
 			To:         []float64{3},
 			Resolution: 4,
-			NoiseFunction: func(t float64) float64 {
-				return t
+			NoiseFunction: func(t []float64) float64 {
+				return t[0]
 			},
 			Expected: model.Noise{
 				RawNoise: map[string][]float64{
-					"x":     testutils.FloatSlice(1, 3, 4),
+					"t1":    testutils.FloatSlice(1, 3, 4),
 					"value": testutils.FloatSlice(1, 3, 4),
 				},
 				From:       []float64{1},
 				To:         []float64{3},
 				Resolution: 4,
+			},
+		},
+		"basic 2d": {
+			From:       []float64{1, 3},
+			To:         []float64{3, 5},
+			Resolution: 1,
+			NoiseFunction: func(t []float64) float64 {
+				return t[0] + 10*t[1]
+			},
+			Expected: model.Noise{
+				RawNoise: map[string][]float64{
+					"t1": []float64{1, 1, 2, 2},
+					"t2": []float64{3, 4, 3, 4},
+					"value": []float64{
+						1 + 30,
+						1 + 40,
+						2 + 30,
+						2 + 40,
+					},
+				},
+				From:       []float64{1, 3},
+				To:         []float64{3, 5},
+				Resolution: 1,
 			},
 		},
 	}
@@ -61,7 +84,7 @@ func TestGenerate(t *testing.T) {
 		noise.Generate(testCase.From, testCase.To, testCase.Resolution, testCase.NoiseFunction)
 
 		if !noise.Equals(&testCase.Expected) {
-			t.Errorf("%s failed. Expected %#v, receinved %#v", name, testCase.Expected, noise)
+			t.Errorf("%s failed. Expected %#v, received %#v", name, testCase.Expected, noise)
 		}
 	}
 }
@@ -80,7 +103,7 @@ func TestEquals(t *testing.T) {
 		"equal full": {
 			Left: model.Noise{
 				RawNoise: map[string][]float64{
-					"x":     []float64{0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5},
+					"t1":    []float64{0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5},
 					"value": []float64{0.10491637639740707, 0.02522960371433485, 0.14240998620874543, -0.06951808844985238, 0.22028277620639095, -0.0036129201768815805, 0.16743035692290176, -0.08762397550026342, 0.25150755724035145, -0.1495588243161205, 0.21620418268684216, -0.11448528972805566, 0.18006882300120994, -0.1482459144529171, 0.12864632754084612, -0.15321647422470572, 0.040347426422610716, -0.14143833187807403, 0.16947245271105693, -0.09200993524802667},
 				},
 				From:          []float64{0},
@@ -90,7 +113,7 @@ func TestEquals(t *testing.T) {
 			},
 			Right: model.Noise{
 				RawNoise: map[string][]float64{
-					"x":     []float64{0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5},
+					"t1":    []float64{0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5},
 					"value": []float64{0.10491637639740707, 0.02522960371433485, 0.14240998620874543, -0.06951808844985238, 0.22028277620639095, -0.0036129201768815805, 0.16743035692290176, -0.08762397550026342, 0.25150755724035145, -0.1495588243161205, 0.21620418268684216, -0.11448528972805566, 0.18006882300120994, -0.1482459144529171, 0.12864632754084612, -0.15321647422470572, 0.040347426422610716, -0.14143833187807403, 0.16947245271105693, -0.09200993524802667},
 				},
 				From:          []float64{0},
@@ -103,7 +126,7 @@ func TestEquals(t *testing.T) {
 		"almost equal full": {
 			Left: model.Noise{
 				RawNoise: map[string][]float64{
-					"x":     []float64{0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5},
+					"t1":    []float64{0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5},
 					"value": []float64{0.10491637639740707, 0.02522960371433485, 0.14240998620874543, -0.06951808844985238, 0.22028277620639095, -0.0036129201768815805, 0.16743035692590176, -0.08762397550026342, 0.25150755724035145, -0.1495588243161205, 0.21620418268684216, -0.11448528972805566, 0.18006882300120994, -0.1482459144529171, 0.12864632754084612, -0.15321647422470572, 0.040347426422610716, -0.14143833187807403, 0.16947245271105693, -0.09200993524802667},
 				},
 				From:          []float64{0},
@@ -113,7 +136,7 @@ func TestEquals(t *testing.T) {
 			},
 			Right: model.Noise{
 				RawNoise: map[string][]float64{
-					"x":     []float64{0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5},
+					"t1":    []float64{0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5},
 					"value": []float64{0.10491637639740707, 0.02522960371433485, 0.14240998620874543, -0.06951808844985238, 0.22028277620639095, -0.0036129201768815805, 0.16743035692290176, -0.08762397550026342, 0.25150755724035145, -0.1495588243161205, 0.21620418268684216, -0.11448528972805566, 0.18006882300120994, -0.1482459144529171, 0.12864632754084612, -0.15321647422470572, 0.040347426422610716, -0.14143833187807403, 0.16947245271105693, -0.09200993524802667},
 				},
 				From:          []float64{0},
@@ -144,13 +167,13 @@ func TestEquals(t *testing.T) {
 		"different dimensions": {
 			Left: model.Noise{
 				RawNoise: map[string][]float64{
-					"x":     []float64{1, 2},
+					"t1":    []float64{1, 2},
 					"value": []float64{1, 2, 3},
 				},
 			},
 			Right: model.Noise{
 				RawNoise: map[string][]float64{
-					"y":     []float64{1, 2},
+					"t2":    []float64{1, 2},
 					"value": []float64{1, 2, 3},
 				},
 			},
@@ -159,14 +182,14 @@ func TestEquals(t *testing.T) {
 		"different number of dimensions": {
 			Left: model.Noise{
 				RawNoise: map[string][]float64{
-					"x":     []float64{1, 2},
-					"y":     []float64{1, 2},
+					"t1":    []float64{1, 2},
+					"t2":    []float64{1, 2},
 					"value": []float64{1, 2, 3},
 				},
 			},
 			Right: model.Noise{
 				RawNoise: map[string][]float64{
-					"x":     []float64{1, 2},
+					"t1":    []float64{1, 2},
 					"value": []float64{1, 2, 3},
 				},
 			},
@@ -175,13 +198,13 @@ func TestEquals(t *testing.T) {
 		"different length of dimensions": {
 			Left: model.Noise{
 				RawNoise: map[string][]float64{
-					"x":     []float64{1, 2, 3},
+					"t1":    []float64{1, 2, 3},
 					"value": []float64{1, 2, 3},
 				},
 			},
 			Right: model.Noise{
 				RawNoise: map[string][]float64{
-					"x":     []float64{1, 2},
+					"t1":    []float64{1, 2},
 					"value": []float64{1, 2, 3},
 				},
 			},

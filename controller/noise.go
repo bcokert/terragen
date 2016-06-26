@@ -60,7 +60,11 @@ func (server *Server) Noise(response http.ResponseWriter, request *http.Request)
 func (server *Server) getNoise(from, to []float64, resolution int, noiseFunction, gen, transformer, synthesizer string) (output []byte, err error) {
 	response := model.NewNoise(noiseFunction)
 
-	response.Generate(from, to, resolution, presets.Spectral1DPresets[noiseFunction](server.Seed, []float64{1, 2, 4, 8, 16, 32, 64}))
+	base1dFn := presets.Spectral1DPresets[noiseFunction](server.Seed, []float64{1, 2, 4, 8, 16, 32, 64})
+	noiseFn := func(t []float64) float64 {
+		return base1dFn(t[0])
+	}
+	response.Generate(from, to, resolution, noiseFn)
 
 	return server.Marshal(response)
 }
