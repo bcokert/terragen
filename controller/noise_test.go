@@ -387,7 +387,7 @@ func TestGetNoise_Success(t *testing.T) {
 			t.Errorf("%s failed. Failed to decode response: %s", name, response.Body.String())
 		}
 
-		if !responseObject.Equals(&testCase.ExpectedResponse) {
+		if !responseObject.IsEqual(&testCase.ExpectedResponse) {
 			t.Errorf("%s failed. Expected response '%#v', received '%#v'", name, testCase.ExpectedResponse, responseObject)
 		}
 

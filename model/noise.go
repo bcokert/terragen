@@ -5,6 +5,7 @@ import (
 
 	"math"
 
+	"github.com/bcokert/terragen/log"
 	"github.com/bcokert/terragen/noise"
 )
 
@@ -71,21 +72,24 @@ func (noise *Noise) Generate(from, to []float64, resolution int, noiseFunction n
 	noise.Resolution = resolution
 }
 
-// Equals returns true if the other Noise is equal
-func (noise *Noise) Equals(other *Noise) bool {
+// IsEqual returns true if the other Noise is equal to this one
+func (noise *Noise) IsEqual(other *Noise) bool {
 	if len(noise.RawNoise) != len(other.RawNoise) {
 		return false
 	}
 
 	for dimension, values := range other.RawNoise {
 		if _, ok := noise.RawNoise[dimension]; !ok {
+			log.Debug("The other did not have dimension %v", dimension)
 			return false
 		}
 		if len(noise.RawNoise[dimension]) != len(values) {
+			log.Debug("Dimension %v length: expected %v, found %v", dimension, len(noise.RawNoise[dimension]), len(values))
 			return false
 		}
 		for i, value := range values {
 			if math.Abs(noise.RawNoise[dimension][i]-value) > 0.00000000000001 {
+				log.Debug("Dimension %v at index %d: expected %v, found %v", dimension, i, noise.RawNoise[dimension][i], value)
 				return false
 			}
 		}

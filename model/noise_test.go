@@ -22,7 +22,7 @@ func TestNewNoise(t *testing.T) {
 
 	for name, testCase := range testCases {
 		result := model.NewNoise(testCase.NoiseFunction)
-		if !result.Equals(&testCase.Expected) {
+		if !result.IsEqual(&testCase.Expected) {
 			t.Errorf("%s failed. Expected %#v, received %#v", name, testCase.Expected, result)
 		}
 	}
@@ -36,44 +36,109 @@ func TestGenerate(t *testing.T) {
 		NoiseFunction noise.Function
 		Expected      model.Noise
 	}{
-		"basic 1d": {
-			From:       []float64{1},
+		"1d simple": {
+			From:       []float64{-1},
 			To:         []float64{3},
 			Resolution: 4,
 			NoiseFunction: func(t []float64) float64 {
-				return t[0]
+				return t[0] * 2
 			},
 			Expected: model.Noise{
 				RawNoise: map[string][]float64{
-					"t1":    []float64{1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75},
-					"value": []float64{1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75},
+					"t1":    []float64{-1, -0.75, -0.5, -0.25, 0, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75},
+					"value": []float64{-2, -1.5, -1, -0.5, 0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5},
 				},
-				From:       []float64{1},
+				From:       []float64{-1},
 				To:         []float64{3},
 				Resolution: 4,
 			},
 		},
-		"basic 2d": {
-			From:       []float64{1, 3},
+		"1d empty range": {
+			From:       []float64{3},
+			To:         []float64{3},
+			Resolution: 4,
+			NoiseFunction: func(t []float64) float64 {
+				return t[0] * 2
+			},
+			Expected: model.Noise{
+				RawNoise: map[string][]float64{
+					"t1":    []float64{},
+					"value": []float64{},
+				},
+				From:       []float64{3},
+				To:         []float64{3},
+				Resolution: 4,
+			},
+		},
+		"1d high resolution": {
+			From:       []float64{0},
+			To:         []float64{1},
+			Resolution: 25,
+			NoiseFunction: func(t []float64) float64 {
+				return t[0] * 3
+			},
+			Expected: model.Noise{
+				RawNoise: map[string][]float64{
+					"t1":    []float64{0, 0.04, 0.08, 0.12, 0.16, 0.2, 0.24, 0.28, 0.32, 0.36, 0.4, 0.44, 0.48, 0.52, 0.56, 0.6, 0.64, 0.68, 0.72, 0.76, 0.8, 0.84, 0.88, 0.92, 0.96},
+					"value": []float64{0, 0.12, 0.24, 0.36, 0.48, 0.60, 0.72, 0.84, 0.96, 1.08, 1.20, 1.32, 1.44, 1.56, 1.68, 1.80, 1.92, 2.04, 2.16, 2.28, 2.40, 2.52, 2.64, 2.76, 2.88},
+				},
+				From:       []float64{0},
+				To:         []float64{1},
+				Resolution: 25,
+			},
+		},
+		"2d simple": {
+			From:       []float64{-1, 3},
 			To:         []float64{3, 5},
-			Resolution: 1,
+			Resolution: 2,
 			NoiseFunction: func(t []float64) float64 {
 				return t[0] + 10*t[1]
 			},
 			Expected: model.Noise{
 				RawNoise: map[string][]float64{
-					"t1": []float64{1, 1, 2, 2},
-					"t2": []float64{3, 4, 3, 4},
-					"value": []float64{
-						1 + 30,
-						1 + 40,
-						2 + 30,
-						2 + 40,
-					},
+					"t1":    []float64{-1, -0.5, -1, -0.5, 0, 0.5, 0, 0.5, 1, 1.5, 1, 1.5, 2, 2.5, 2, 2.5},
+					"t2":    []float64{3, 3.5, 4, 4.5, 3, 3.5, 4, 4.5, 3, 3.5, 4, 4.5, 3, 3.5, 4, 4.5},
+					"value": []float64{29, 34.5, 39, 44.5, 30, 35.5, 40, 45.5, 31, 36.5, 41, 46.5, 32, 37.5, 42, 47.5},
 				},
-				From:       []float64{1, 3},
+				From:       []float64{-1, 3},
 				To:         []float64{3, 5},
-				Resolution: 1,
+				Resolution: 2,
+			},
+		},
+		"2d empty range": {
+			From:       []float64{-1, 3},
+			To:         []float64{-1, 5},
+			Resolution: 2,
+			NoiseFunction: func(t []float64) float64 {
+				return t[0] + 10*t[1]
+			},
+			Expected: model.Noise{
+				RawNoise: map[string][]float64{
+					"t1":    []float64{},
+					"t2":    []float64{},
+					"value": []float64{},
+				},
+				From:       []float64{-1, 3},
+				To:         []float64{-1, 5},
+				Resolution: 2,
+			},
+		},
+		"2d high resolution": {
+			From:       []float64{0, 0},
+			To:         []float64{2, 1},
+			Resolution: 25,
+			NoiseFunction: func(t []float64) float64 {
+				return t[0] + 10*t[1]
+			},
+			Expected: model.Noise{
+				RawNoise: map[string][]float64{
+					"t1":    []float64{0, 0.04, 0.08, 0.12, 0.16, 0.2, 0.24, 0.28, 0.32, 0.36, 0.4, 0.44, 0.48, 0.52, 0.56, 0.6, 0.64, 0.68, 0.72, 0.76, 0.8, 0.84, 0.88, 0.92, 0.96, 1, 1.04, 1.08, 1.12, 1.16, 1.2, 1.24, 1.28, 1.32, 1.36, 1.4, 1.44, 1.48, 1.52, 1.56, 1.6, 1.64, 1.68, 1.72, 1.76, 1.8, 1.84, 1.88, 1.92, 1.96},
+					"t2":    []float64{0, 0.04, 0.08, 0.12, 0.16, 0.2, 0.24, 0.28, 0.32, 0.36, 0.4, 0.44, 0.48, 0.52, 0.56, 0.6, 0.64, 0.68, 0.72, 0.76, 0.8, 0.84, 0.88, 0.92, 0.96, 0, 0.04, 0.08, 0.12, 0.16, 0.2, 0.24, 0.28, 0.32, 0.36, 0.4, 0.44, 0.48, 0.52, 0.56, 0.6, 0.64, 0.68, 0.72, 0.76, 0.8, 0.84, 0.88, 0.92, 0.96},
+					"value": []float64{0, 0.44, 0.88, 1.32, 1.76, 2.2, 2.64, 3.08, 3.52, 3.96, 4.4, 4.84, 5.28, 5.72, 6.16, 6.6, 7.04, 7.48, 7.92, 8.36, 8.8, 9.24, 9.68, 10.12, 10.56, 1, 1.44, 1.88, 2.32, 2.76, 3.2, 3.64, 4.08, 4.52, 4.96, 5.4, 5.84, 6.28, 6.72, 7.16, 7.6, 8.04, 8.48, 8.92, 9.36, 9.8, 10.24, 10.68, 11.12, 11.56},
+				},
+				From:       []float64{0, 0},
+				To:         []float64{2, 1},
+				Resolution: 25,
 			},
 		},
 	}
@@ -82,13 +147,13 @@ func TestGenerate(t *testing.T) {
 		noise := &model.Noise{}
 		noise.Generate(testCase.From, testCase.To, testCase.Resolution, testCase.NoiseFunction)
 
-		if !noise.Equals(&testCase.Expected) {
+		if !noise.IsEqual(&testCase.Expected) {
 			t.Errorf("%s failed. Expected %#v, received %#v", name, testCase.Expected, noise)
 		}
 	}
 }
 
-func TestEquals(t *testing.T) {
+func TestIsEqual(t *testing.T) {
 	testCases := map[string]struct {
 		Left     model.Noise
 		Right    model.Noise
@@ -212,7 +277,7 @@ func TestEquals(t *testing.T) {
 	}
 
 	for name, testCase := range testCases {
-		if testCase.Left.Equals(&testCase.Right) != testCase.Expected {
+		if testCase.Left.IsEqual(&testCase.Right) != testCase.Expected {
 			t.Errorf("%s failed. Expected %#v == %#v to be %v", name, testCase.Left, testCase.Right, testCase.Expected)
 		}
 	}
