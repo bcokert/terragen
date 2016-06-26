@@ -20,8 +20,8 @@ function runIfChanged {
 
   if [ ${SHOULD_RUN} == true ]; then
     clear
-    echo "Watching files under: ${DIR}"
-    echo "Watching all files that match pattern: ${PATTERN}"
+    echo -e "\033[34mWatching files under: ${DIR}\033[0m"
+    echo -e "\033[34mWatching all files that match pattern: ${PATTERN}\033[0m"
     make coverage
   fi
 }
