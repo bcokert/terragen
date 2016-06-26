@@ -21,5 +21,7 @@ generate_cover_data() {
     fi
 }
 
+NUM_TEST_FUNCTIONS=`find . -type f -name "*_test.go" -exec grep -c "func Test" \{\} \; | awk '{s+=$1}END{print s}'`
+echo "Found ${NUM_TEST_FUNCTIONS} test functions"
 generate_cover_data $(go list ./...)
 echo "Run make view-coverage to see the coverage report"
