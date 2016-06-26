@@ -9,6 +9,7 @@ import (
 	"github.com/bcokert/terragen/errors"
 	"github.com/bcokert/terragen/log"
 	"github.com/bcokert/terragen/model"
+	"github.com/bcokert/terragen/noise"
 	"github.com/bcokert/terragen/presets"
 )
 
@@ -16,7 +17,7 @@ import (
 // GET: Applies the given noise function (or creates one from the given params), and returns the noise applied to the given range
 func (server *Server) Noise(response http.ResponseWriter, request *http.Request) {
 	queryParams := request.URL.Query()
-	log.Info("Received Request: %s %s", request.Method, request.URL.String())
+	log.Info("Request Started: %s %s", request.Method, request.URL.String())
 
 	response.Header().Set("Access-Control-Allow-Origin", "*")
 
@@ -48,7 +49,7 @@ func (server *Server) Noise(response http.ResponseWriter, request *http.Request)
 			return
 		}
 
-		if jsonResponse, err = server.getNoise(from, to, resolution, noiseFunction, "", "", ""); err != nil {
+		if jsonResponse, err = server.getNoise(from, to, resolution, noiseFunction); err != nil {
 			errors.WriteError(response, errors.ErrorWithCause("Noise - Failed to generate noise", err), http.StatusInternalServerError)
 			return
 		}
@@ -59,13 +60,27 @@ func (server *Server) Noise(response http.ResponseWriter, request *http.Request)
 	}
 }
 
-func (server *Server) getNoise(from, to []float64, resolution int, noiseFunction, gen, transformer, synthesizer string) (output []byte, err error) {
+func (server *Server) getNoise(from, to []float64, resolution int, noiseFunction string) (output []byte, err error) {
 	response := model.NewNoise(noiseFunction)
 
-	base1dFn := presets.Spectral1DPresets[noiseFunction](server.Seed, []float64{1, 2, 4, 8, 16, 32, 64})
-	noiseFn := func(t []float64) float64 {
-		return base1dFn(t[0])
+	dimension := noiseFunction[len(noiseFunction)-2:]
+	var noiseFn noise.Function
+	switch dimension {
+	case "1d":
+		func1d := presets.Spectral1DPresets[noiseFunction](server.Seed, []float64{1, 2, 4, 8, 16, 32, 64})
+		noiseFn = func(t []float64) float64 {
+			return func1d(t[0])
+		}
+	case "2d":
+		func2d := presets.Spectral2DPresets[noiseFunction](server.Seed, []float64{1, 2, 4, 8, 16, 32, 64})
+		noiseFn = func(t []float64) float64 {
+			return func2d(t[0], t[1])
+		}
+	default:
+		// TODO: Remove - cannot occur, but put here just until multidimensional noise is fully implemented
+		return []byte{}, fmt.Errorf("Illegal dimension on noise function %s: %s", noiseFunction, dimension)
 	}
+
 	response.Generate(from, to, resolution, noiseFn)
 
 	return server.Marshal(response)
@@ -80,10 +95,6 @@ func validateFrom(queryParams url.Values) (from []float64, err error) {
 		return []float64{}, fmt.Errorf("Invalid. Must not be empty")
 	}
 
-	if len(from) > 1 {
-		return []float64{}, errors.UnsupportedError("Multiple dimensions")
-	}
-
 	return from, nil
 }
 
@@ -94,10 +105,6 @@ func validateTo(queryParams url.Values) (to []float64, err error) {
 
 	if len(to) == 0 {
 		return []float64{}, fmt.Errorf("Invalid. Must not be empty")
-	}
-
-	if len(to) > 1 {
-		return []float64{}, errors.UnsupportedError("Multiple dimensions")
 	}
 
 	return to, nil
@@ -123,6 +130,12 @@ func validateNoiseFunction(queryParams url.Values) (noiseFunction string, err er
 	}
 
 	for noiseFn, _ := range presets.Spectral1DPresets {
+		if noiseFunction == noiseFn {
+			return noiseFunction, nil
+		}
+	}
+
+	for noiseFn, _ := range presets.Spectral2DPresets {
 		if noiseFunction == noiseFn {
 			return noiseFunction, nil
 		}

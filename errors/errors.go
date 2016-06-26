@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+
+	"github.com/bcokert/terragen/log"
 )
 
 // ErrorWithCause creates a new error that encodes the old error within it
@@ -19,6 +21,7 @@ func UnsupportedError(feature string) error {
 
 // WriteError writes a standard error response to the response writer
 func WriteError(response http.ResponseWriter, e error, httpStatus int) {
+	log.Debug("Request Error (%d): %s", httpStatus, e.Error())
 	response.WriteHeader(httpStatus)
 	fmt.Fprintf(response, `{"error": "%s"}`, e.Error())
 }

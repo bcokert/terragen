@@ -33,11 +33,6 @@ func TestGetNoise_InputValidation(t *testing.T) {
 			ExpectedBody: `{"error": "Noise - Invalid 'from' param: (Illegal. Expected a list of numbers)"}`,
 			ExpectedCode: http.StatusBadRequest,
 		},
-		"unsupported mutlidimension from": {
-			Url:          "/noise?from=52,55,62&to=12&resolution=14&noiseFunction=white",
-			ExpectedBody: fmt.Sprintf(`{"error": "Noise - Invalid 'from' param: (%s)"}`, errors.UnsupportedError("Multiple dimensions").Error()),
-			ExpectedCode: http.StatusBadRequest,
-		},
 		"missing to": {
 			Url:          "/noise?from=14&resolution=14&noiseFunction=white",
 			ExpectedBody: `{"error": "Noise - Invalid 'to' param: (Invalid. Must not be empty)"}`,
@@ -46,11 +41,6 @@ func TestGetNoise_InputValidation(t *testing.T) {
 		"illegal to": {
 			Url:          "/noise?from=15&to=52,banana&resolution=14&noiseFunction=white",
 			ExpectedBody: `{"error": "Noise - Invalid 'to' param: (Illegal. Expected a list of numbers)"}`,
-			ExpectedCode: http.StatusBadRequest,
-		},
-		"unsupported mutlidimension to": {
-			Url:          "/noise?from=15&to=52,52&resolution=14&noiseFunction=white",
-			ExpectedBody: fmt.Sprintf(`{"error": "Noise - Invalid 'to' param: (%s)"}`, errors.UnsupportedError("Multiple dimensions").Error()),
 			ExpectedCode: http.StatusBadRequest,
 		},
 		"missing resolution": {
@@ -178,6 +168,11 @@ func TestGetNoise_Success(t *testing.T) {
 		"white:1d":  {PresetName: "white:1d"},
 		"pink:1d":   {PresetName: "pink:1d"},
 		"red:1d":    {PresetName: "red:1d"},
+		"violet:2d": {PresetName: "violet:2d"},
+		"blue:2d":   {PresetName: "blue:2d"},
+		"white:2d":  {PresetName: "white:2d"},
+		"pink:2d":   {PresetName: "pink:2d"},
+		"red:2d":    {PresetName: "red:2d"},
 	}
 
 	fromCases := map[string][][]float64{
@@ -186,7 +181,7 @@ func TestGetNoise_Success(t *testing.T) {
 	}
 	toCases := map[string][][]float64{
 		"1d": [][]float64{[]float64{-1}, []float64{6}, []float64{55}, []float64{5}},
-		"2d": [][]float64{[]float64{0, 5}, []float64{0, 0}, []float64{1, 23}, []float64{55, 999}, []float64{-6, 7}},
+		"2d": [][]float64{[]float64{0, 5}, []float64{0, 0}, []float64{1, 23}, []float64{55, 999}, []float64{-2, 7}},
 	}
 	resolutionCases := map[string][]int{
 		"1d": []int{4, 50, 1, 2},
@@ -236,16 +231,19 @@ func TestGetNoise_Success(t *testing.T) {
 			expectedResponse.Generate(fromCases[dimension][i], toCases[dimension][i], resolutionCases[dimension][i], noiseFunction)
 
 			responseObject := model.Noise{}
+			if response.Code != http.StatusOK {
+				t.Errorf("%s failed. Expected code %d, received %d", name, http.StatusOK, response.Code)
+				t.Logf("Response: %s", response.Body.String())
+				continue
+			}
+
 			if err := json.NewDecoder(response.Body).Decode(&responseObject); err != nil {
 				t.Errorf("%s failed. Failed to decode response: %s", name, response.Body.String())
+				continue
 			}
 
 			if !responseObject.IsEqual(expectedResponse) {
 				t.Errorf("%s with request '%s' failed. Expected response '%#v', received '%#v'", name, url, expectedResponse, responseObject)
-			}
-
-			if response.Code != http.StatusOK {
-				t.Errorf("%s failed. Expected code %d, received %d", name, http.StatusOK, response.Code)
 			}
 		}
 	}
