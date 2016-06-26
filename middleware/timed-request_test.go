@@ -20,14 +20,14 @@ func TestTimedRequest(t *testing.T) {
 			Handler: func(w http.ResponseWriter, r *http.Request) {
 				time.Sleep(3000000)
 			},
-			ExpectedLogRegex: `I: MyHandler took [3-4]\.\d*ms`,
+			ExpectedLogRegex: `INFO: MyHandler took [3-4]\.\d*ms`,
 		},
 		"Failing Handler": {
 			Handler: func(w http.ResponseWriter, r *http.Request) {
 				time.Sleep(1000000)
 				w.WriteHeader(500)
 			},
-			ExpectedLogRegex: `I: MyHandler took [1-2]\.\d*ms`,
+			ExpectedLogRegex: `INFO: MyHandler took [1-2]\.\d*ms`,
 		},
 	}
 
