@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/bcokert/terragen/errors"
+	"github.com/bcokert/terragen/log"
 	"github.com/bcokert/terragen/model"
 	"github.com/bcokert/terragen/presets"
 )
@@ -15,6 +16,7 @@ import (
 // GET: Applies the given noise function (or creates one from the given params), and returns the noise applied to the given range
 func (server *Server) Noise(response http.ResponseWriter, request *http.Request) {
 	queryParams := request.URL.Query()
+	log.Info("Received Request: %s %s", request.Method, request.URL.String())
 
 	response.Header().Set("Access-Control-Allow-Origin", "*")
 

@@ -4,11 +4,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/bcokert/terragen/controller"
 	"github.com/bcokert/terragen/errors"
 	"github.com/bcokert/terragen/model"
+	"github.com/bcokert/terragen/noise"
 	"github.com/bcokert/terragen/presets"
 	"github.com/bcokert/terragen/router"
 	"github.com/bcokert/terragen/testutils"
@@ -168,205 +171,26 @@ func TestGetNoise_MissingHTTPMethods(t *testing.T) {
 
 func TestGetNoise_Success(t *testing.T) {
 	testCases := map[string]struct {
-		Url              string
-		ExpectedResponse model.Noise
-		ExpectedCode     int
+		PresetName string
 	}{
-		"violet1d simple": {
-			Url: "/noise?from=0&to=10&resolution=2&noiseFunction=violet:1d",
-			ExpectedResponse: model.Noise{
-				RawNoise: map[string][]float64{
-					"t1": []float64{0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5},
-				},
-				From:          []float64{0},
-				To:            []float64{10},
-				Resolution:    2,
-				NoiseFunction: "violet:1d",
-			},
-			ExpectedCode: http.StatusOK,
-		},
-		"violet1d empty range": {
-			Url: "/noise?from=0&to=0&resolution=2&noiseFunction=violet:1d",
-			ExpectedResponse: model.Noise{
-				RawNoise: map[string][]float64{
-					"t1": []float64{},
-				},
-				From:          []float64{0},
-				To:            []float64{0},
-				Resolution:    2,
-				NoiseFunction: "violet:1d",
-			},
-			ExpectedCode: http.StatusOK,
-		},
-		"violet1d large resolution": {
-			Url: "/noise?from=0&to=1&resolution=25&noiseFunction=violet:1d",
-			ExpectedResponse: model.Noise{
-				RawNoise: map[string][]float64{
-					"t1": []float64{0, 0.04, 0.08, 0.12, 0.16, 0.2, 0.24, 0.28, 0.32, 0.36, 0.4, 0.44, 0.48, 0.52, 0.56, 0.6, 0.64, 0.68, 0.72, 0.76, 0.8, 0.84, 0.88, 0.92, 0.96},
-				},
-				From:          []float64{0},
-				To:            []float64{1},
-				Resolution:    25,
-				NoiseFunction: "violet:1d",
-			},
-			ExpectedCode: http.StatusOK,
-		},
-		"blue1d simple": {
-			Url: "/noise?from=0&to=10&resolution=2&noiseFunction=blue:1d",
-			ExpectedResponse: model.Noise{
-				RawNoise: map[string][]float64{
-					"t1": []float64{0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5},
-				},
-				From:          []float64{0},
-				To:            []float64{10},
-				Resolution:    2,
-				NoiseFunction: "blue:1d",
-			},
-			ExpectedCode: http.StatusOK,
-		},
-		"blue1d empty range": {
-			Url: "/noise?from=0&to=0&resolution=2&noiseFunction=blue:1d",
-			ExpectedResponse: model.Noise{
-				RawNoise: map[string][]float64{
-					"t1": []float64{},
-				},
-				From:          []float64{0},
-				To:            []float64{0},
-				Resolution:    2,
-				NoiseFunction: "blue:1d",
-			},
-			ExpectedCode: http.StatusOK,
-		},
-		"blue1d large resolution": {
-			Url: "/noise?from=0&to=1&resolution=25&noiseFunction=blue:1d",
-			ExpectedResponse: model.Noise{
-				RawNoise: map[string][]float64{
-					"t1": []float64{0, 0.04, 0.08, 0.12, 0.16, 0.2, 0.24, 0.28, 0.32, 0.36, 0.4, 0.44, 0.48, 0.52, 0.56, 0.6, 0.64, 0.68, 0.72, 0.76, 0.8, 0.84, 0.88, 0.92, 0.96},
-				},
-				From:          []float64{0},
-				To:            []float64{1},
-				Resolution:    25,
-				NoiseFunction: "blue:1d",
-			},
-			ExpectedCode: http.StatusOK,
-		},
-		"white1d simple": {
-			Url: "/noise?from=0&to=10&resolution=2&noiseFunction=white:1d",
-			ExpectedResponse: model.Noise{
-				RawNoise: map[string][]float64{
-					"t1": []float64{0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5},
-				},
-				From:          []float64{0},
-				To:            []float64{10},
-				Resolution:    2,
-				NoiseFunction: "white:1d",
-			},
-			ExpectedCode: http.StatusOK,
-		},
-		"white1d empty range": {
-			Url: "/noise?from=0&to=0&resolution=2&noiseFunction=white:1d",
-			ExpectedResponse: model.Noise{
-				RawNoise: map[string][]float64{
-					"t1": []float64{},
-				},
-				From:          []float64{0},
-				To:            []float64{0},
-				Resolution:    2,
-				NoiseFunction: "white:1d",
-			},
-			ExpectedCode: http.StatusOK,
-		},
-		"white1d large resolution": {
-			Url: "/noise?from=0&to=1&resolution=25&noiseFunction=white:1d",
-			ExpectedResponse: model.Noise{
-				RawNoise: map[string][]float64{
-					"t1": []float64{0, 0.04, 0.08, 0.12, 0.16, 0.2, 0.24, 0.28, 0.32, 0.36, 0.4, 0.44, 0.48, 0.52, 0.56, 0.6, 0.64, 0.68, 0.72, 0.76, 0.8, 0.84, 0.88, 0.92, 0.96},
-				},
-				From:          []float64{0},
-				To:            []float64{1},
-				Resolution:    25,
-				NoiseFunction: "white:1d",
-			},
-			ExpectedCode: http.StatusOK,
-		},
-		"pink1d simple": {
-			Url: "/noise?from=0&to=10&resolution=2&noiseFunction=pink:1d",
-			ExpectedResponse: model.Noise{
-				RawNoise: map[string][]float64{
-					"t1": []float64{0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5},
-				},
-				From:          []float64{0},
-				To:            []float64{10},
-				Resolution:    2,
-				NoiseFunction: "pink:1d",
-			},
-			ExpectedCode: http.StatusOK,
-		},
-		"pink1d empty range": {
-			Url: "/noise?from=0&to=0&resolution=2&noiseFunction=pink:1d",
-			ExpectedResponse: model.Noise{
-				RawNoise: map[string][]float64{
-					"t1": []float64{},
-				},
-				From:          []float64{0},
-				To:            []float64{0},
-				Resolution:    2,
-				NoiseFunction: "pink:1d",
-			},
-			ExpectedCode: http.StatusOK,
-		},
-		"pink1d large resolution": {
-			Url: "/noise?from=0&to=1&resolution=25&noiseFunction=pink:1d",
-			ExpectedResponse: model.Noise{
-				RawNoise: map[string][]float64{
-					"t1": []float64{0, 0.04, 0.08, 0.12, 0.16, 0.2, 0.24, 0.28, 0.32, 0.36, 0.4, 0.44, 0.48, 0.52, 0.56, 0.6, 0.64, 0.68, 0.72, 0.76, 0.8, 0.84, 0.88, 0.92, 0.96},
-				},
-				From:          []float64{0},
-				To:            []float64{1},
-				Resolution:    25,
-				NoiseFunction: "pink:1d",
-			},
-			ExpectedCode: http.StatusOK,
-		},
-		"red1d simple": {
-			Url: "/noise?from=0&to=10&resolution=2&noiseFunction=red:1d",
-			ExpectedResponse: model.Noise{
-				RawNoise: map[string][]float64{
-					"t1": []float64{0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5},
-				},
-				From:          []float64{0},
-				To:            []float64{10},
-				Resolution:    2,
-				NoiseFunction: "red:1d",
-			},
-			ExpectedCode: http.StatusOK,
-		},
-		"red1d empty range": {
-			Url: "/noise?from=0&to=0&resolution=2&noiseFunction=red:1d",
-			ExpectedResponse: model.Noise{
-				RawNoise: map[string][]float64{
-					"t1": []float64{},
-				},
-				From:          []float64{0},
-				To:            []float64{0},
-				Resolution:    2,
-				NoiseFunction: "red:1d",
-			},
-			ExpectedCode: http.StatusOK,
-		},
-		"red1d large resolution": {
-			Url: "/noise?from=0&to=1&resolution=25&noiseFunction=red:1d",
-			ExpectedResponse: model.Noise{
-				RawNoise: map[string][]float64{
-					"t1": []float64{0, 0.04, 0.08, 0.12, 0.16, 0.2, 0.24, 0.28, 0.32, 0.36, 0.4, 0.44, 0.48, 0.52, 0.56, 0.6, 0.64, 0.68, 0.72, 0.76, 0.8, 0.84, 0.88, 0.92, 0.96},
-				},
-				From:          []float64{0},
-				To:            []float64{1},
-				Resolution:    25,
-				NoiseFunction: "red:1d",
-			},
-			ExpectedCode: http.StatusOK,
-		},
+		"violet:1d": {PresetName: "violet:1d"},
+		"blue:1d":   {PresetName: "blue:1d"},
+		"white:1d":  {PresetName: "white:1d"},
+		"pink:1d":   {PresetName: "pink:1d"},
+		"red:1d":    {PresetName: "red:1d"},
+	}
+
+	fromCases := map[string][][]float64{
+		"1d": [][]float64{[]float64{-3}, []float64{0}, []float64{-12}, []float64{5}},
+		"2d": [][]float64{[]float64{-3, 0}, []float64{-1, -1}, []float64{0, 21}, []float64{55, 91}, []float64{-4, 7}},
+	}
+	toCases := map[string][][]float64{
+		"1d": [][]float64{[]float64{-1}, []float64{6}, []float64{55}, []float64{5}},
+		"2d": [][]float64{[]float64{0, 5}, []float64{0, 0}, []float64{1, 23}, []float64{55, 999}, []float64{-6, 7}},
+	}
+	resolutionCases := map[string][]int{
+		"1d": []int{4, 50, 1, 2},
+		"2d": []int{4, 50, 1, 2, 2},
 	}
 
 	for name, testCase := range testCases {
@@ -374,25 +198,55 @@ func TestGetNoise_Success(t *testing.T) {
 			Seed:    42,
 			Marshal: json.Marshal,
 		}
-		response := testutils.ExecuteTestRequest(router.CreateDefaultRouter(server), http.MethodGet, testCase.Url, nil)
 
-		expectedNoiseFunction := presets.Spectral1DPresets[testCase.ExpectedResponse.NoiseFunction](42, []float64{1, 2, 4, 8, 16, 32, 64})
-		testCase.ExpectedResponse.RawNoise["value"] = []float64{}
-		for _, x := range testCase.ExpectedResponse.RawNoise["t1"] {
-			testCase.ExpectedResponse.RawNoise["value"] = append(testCase.ExpectedResponse.RawNoise["value"], expectedNoiseFunction(x))
-		}
+		dimension := testCase.PresetName[len(testCase.PresetName)-2:]
 
-		responseObject := model.Noise{}
-		if err := json.NewDecoder(response.Body).Decode(&responseObject); err != nil {
-			t.Errorf("%s failed. Failed to decode response: %s", name, response.Body.String())
-		}
+		for i := range fromCases[dimension] {
+			froms := []string{}
+			for _, from := range fromCases[dimension][i] {
+				froms = append(froms, fmt.Sprintf("%v", from))
+			}
+			fromString := strings.Join(froms, ",")
+			tos := []string{}
+			for _, to := range toCases[dimension][i] {
+				tos = append(tos, fmt.Sprintf("%v", to))
+			}
+			toString := strings.Join(tos, ",")
+			resolutionString := strconv.Itoa(resolutionCases[dimension][i])
+			url := fmt.Sprintf("/noise?from=%s&to=%s&resolution=%s&noiseFunction=%s", fromString, toString, resolutionString, testCase.PresetName)
 
-		if !responseObject.IsEqual(&testCase.ExpectedResponse) {
-			t.Errorf("%s failed. Expected response '%#v', received '%#v'", name, testCase.ExpectedResponse, responseObject)
-		}
+			var noiseFunction noise.Function
+			switch dimension {
+			case "1d":
+				func1d := presets.Spectral1DPresets[testCase.PresetName](42, []float64{1, 2, 4, 8, 16, 32, 64})
+				noiseFunction = func(t []float64) float64 {
+					return func1d(t[0])
+				}
+			case "2d":
+				func2d := presets.Spectral2DPresets[testCase.PresetName](42, []float64{1, 2, 4, 8, 16, 32, 64})
+				noiseFunction = func(t []float64) float64 {
+					return func2d(t[0], t[1])
+				}
+			default:
+				t.Fatalf("Unkown noise function dimension: %s", dimension)
+			}
 
-		if response.Code != testCase.ExpectedCode {
-			t.Errorf("%s failed. Expected code %d, received %d", name, testCase.ExpectedCode, response.Code)
+			response := testutils.ExecuteTestRequest(router.CreateDefaultRouter(server), http.MethodGet, url, nil)
+			expectedResponse := model.NewNoise(testCase.PresetName)
+			expectedResponse.Generate(fromCases[dimension][i], toCases[dimension][i], resolutionCases[dimension][i], noiseFunction)
+
+			responseObject := model.Noise{}
+			if err := json.NewDecoder(response.Body).Decode(&responseObject); err != nil {
+				t.Errorf("%s failed. Failed to decode response: %s", name, response.Body.String())
+			}
+
+			if !responseObject.IsEqual(expectedResponse) {
+				t.Errorf("%s with request '%s' failed. Expected response '%#v', received '%#v'", name, url, expectedResponse, responseObject)
+			}
+
+			if response.Code != http.StatusOK {
+				t.Errorf("%s failed. Expected code %d, received %d", name, http.StatusOK, response.Code)
+			}
 		}
 	}
 }
