@@ -3,6 +3,8 @@ package model
 import (
 	"strconv"
 
+	"math"
+
 	"github.com/bcokert/terragen/noise"
 )
 
@@ -70,12 +72,12 @@ func (noise *Noise) Generate(from, to []float64, resolution int, noiseFunction n
 }
 
 // Equals returns true if the other Noise is equal
-func (noise *Noise) Equals(o *Noise) bool {
-	if len(noise.RawNoise) != len(o.RawNoise) {
+func (noise *Noise) Equals(other *Noise) bool {
+	if len(noise.RawNoise) != len(other.RawNoise) {
 		return false
 	}
 
-	for dimension, values := range o.RawNoise {
+	for dimension, values := range other.RawNoise {
 		if _, ok := noise.RawNoise[dimension]; !ok {
 			return false
 		}
@@ -83,23 +85,23 @@ func (noise *Noise) Equals(o *Noise) bool {
 			return false
 		}
 		for i, value := range values {
-			if noise.RawNoise[dimension][i] != value {
+			if math.Abs(noise.RawNoise[dimension][i]-value) > 0.00000000000001 {
 				return false
 			}
 		}
 	}
 
-	for i, v := range o.From {
+	for i, v := range other.From {
 		if noise.From[i] != v {
 			return false
 		}
 	}
 
-	for i, v := range o.To {
+	for i, v := range other.To {
 		if noise.To[i] != v {
 			return false
 		}
 	}
 
-	return noise.Resolution == o.Resolution && noise.NoiseFunction == o.NoiseFunction
+	return noise.Resolution == other.Resolution && noise.NoiseFunction == other.NoiseFunction
 }
