@@ -60,7 +60,7 @@ func (server *Server) Noise(response http.ResponseWriter, request *http.Request)
 func (server *Server) getNoise(from, to []float64, resolution int, noiseFunction, gen, transformer, synthesizer string) (output []byte, err error) {
 	response := model.NewNoise(noiseFunction)
 
-	response.Generate(from, to, resolution, presets.SpectralPresets[noiseFunction](server.Seed, []float64{1, 2, 4, 8, 16, 32, 64}))
+	response.Generate(from, to, resolution, presets.Spectral1DPresets[noiseFunction](server.Seed, []float64{1, 2, 4, 8, 16, 32, 64}))
 
 	return server.Marshal(response)
 }
@@ -116,7 +116,7 @@ func validateNoiseFunction(queryParams url.Values) (noiseFunction string, err er
 		return "", fmt.Errorf("Invalid. Expected a noise function preset or id")
 	}
 
-	for noiseFn, _ := range presets.SpectralPresets {
+	for noiseFn, _ := range presets.Spectral1DPresets {
 		if noiseFunction == noiseFn {
 			return noiseFunction, nil
 		}
