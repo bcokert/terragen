@@ -13,15 +13,12 @@ import (
 
 func testSpectral1D(t *testing.T, preset presets.Spectral1DPreset, weightExponent float64) {
 	testCases := map[string]struct {
-		InputParams []float64
 		Frequencies []float64
 	}{
 		"one frequency": {
-			InputParams: []float64{-1, 0, 1, 1.5, 2, 50},
 			Frequencies: []float64{1},
 		},
 		"multi frequency": {
-			InputParams: []float64{-1, 0, 1},
 			Frequencies: []float64{1, 2, 3},
 		},
 	}
@@ -38,12 +35,8 @@ func testSpectral1D(t *testing.T, preset presets.Spectral1DPreset, weightExponen
 
 		noiseFunction := preset(42, testCase.Frequencies)
 
-		for _, param := range testCase.InputParams {
-			expected := expectedSynthesizerFn(param)
-			result := noiseFunction(param)
-			if math.Abs(result-expected) > 0.0000000000001 {
-				t.Errorf("%s failed. Expected param %v to result in %v, received %v", name, param, expected, result)
-			}
+		if !noiseFunction.IsEqual(expectedSynthesizerFn) {
+			t.Errorf("%s failed. Noise function did not equal expected function", name)
 		}
 	}
 }
@@ -70,35 +63,12 @@ func TestRed1D(t *testing.T) {
 
 func testSpectral2D(t *testing.T, preset presets.Spectral2DPreset, weightExponent float64) {
 	testCases := map[string]struct {
-		InputParams [][2]float64
 		Frequencies []float64
 	}{
 		"one frequency": {
-			InputParams: [][2]float64{
-				[2]float64{-1, -1},
-				[2]float64{-1, 0},
-				[2]float64{0, -1},
-				[2]float64{0, 0},
-				[2]float64{1, 1},
-				[2]float64{0.999, 1.001},
-				[2]float64{0, 500},
-				[2]float64{9999, 2244},
-				[2]float64{-33234, 0.0001},
-			},
 			Frequencies: []float64{1},
 		},
 		"multi frequency": {
-			InputParams: [][2]float64{
-				[2]float64{-1, -1},
-				[2]float64{-1, 0},
-				[2]float64{0, -1},
-				[2]float64{0, 0},
-				[2]float64{1, 1},
-				[2]float64{0.999, 1.001},
-				[2]float64{0, 500},
-				[2]float64{9999, 2244},
-				[2]float64{-33234, 0.0001},
-			},
 			Frequencies: []float64{1, 2, 3},
 		},
 	}
@@ -115,12 +85,8 @@ func testSpectral2D(t *testing.T, preset presets.Spectral2DPreset, weightExponen
 
 		noiseFunction := preset(42, testCase.Frequencies)
 
-		for _, params := range testCase.InputParams {
-			expected := expectedSynthesizerFn(params[0], params[1])
-			result := noiseFunction(params[0], params[1])
-			if math.Abs(result-expected) > 0.0000000000001 {
-				t.Errorf("%s failed. Expected params %v to result in %v, received %v", name, params, expected, result)
-			}
+		if !noiseFunction.IsEqual(expectedSynthesizerFn) {
+			t.Errorf("%s failed. Noise function did not equal expected function", name)
 		}
 	}
 }

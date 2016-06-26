@@ -1,6 +1,10 @@
 package noise
 
-import "math"
+import (
+	"math"
+
+	"github.com/bcokert/terragen/log"
+)
 
 // Standard1DInputParams are used to verify equality of 1D noise functions
 // They're helpful for various testing of noise functions
@@ -45,10 +49,12 @@ func (fn Function1D) IsEqual(other Function1D) bool {
 		left, right := fn(param), other(param)
 
 		if (left < 0) != (right < 0) {
+			log.Debug("IsEqual failed on inputs %v: %v != %v", param, left, right)
 			return false
 		}
 
 		if math.Abs(left-right) > 0.00000000000001 {
+			log.Debug("IsEqual failed on inputs %v: %v != %v", param, left, right)
 			return false
 		}
 	}
@@ -61,10 +67,12 @@ func (fn Function2D) IsEqual(other Function2D) bool {
 		left, right := fn(params[0], params[1]), other(params[0], params[1])
 
 		if (left < 0) != (right < 0) {
+			log.Debug("IsEqual failed on inputs %v: %v != %v", params, left, right)
 			return false
 		}
 
 		if math.Abs(left-right) > 0.00000000000001 {
+			log.Debug("IsEqual failed on inputs %v: %v != %v", params, left, right)
 			return false
 		}
 	}

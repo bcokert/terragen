@@ -5,55 +5,45 @@ import (
 	"testing"
 
 	"github.com/bcokert/terragen/generator"
+	"github.com/bcokert/terragen/noise"
 )
 
 func TestRandom1D(t *testing.T) {
+	rand := rand.New(rand.NewSource(27)).Float64
 	testCases := map[string]struct {
-		ExpectedFn func() float64
+		ExpectedFn noise.Function1D
 	}{
-		"multiple functions with same seed": {
-			ExpectedFn: rand.New(rand.NewSource(27)).Float64,
+		"basic": {
+			ExpectedFn: func(t float64) float64 {
+				return rand()
+			},
 		},
 	}
 
 	for name, testCase := range testCases {
-		randomFunction1 := generator.Random1D(27)
-		randomFunction2 := generator.Random1D(27)
-		for i := 0; i < 10; i++ {
-			expected := testCase.ExpectedFn()
-			if result := randomFunction1(1); result != expected {
-				t.Errorf("%s failed. Expected function 1 iteration %d to be %v, received %v", name, i, expected, result)
-			}
-			if result := randomFunction2(1); result != expected {
-				t.Errorf("%s failed. Expected function 1 iteration %d to be %v, received %v", name, i, expected, result)
-			}
+		noiseFunction := generator.Random1D(27)
+		if !noiseFunction.IsEqual(testCase.ExpectedFn) {
+			t.Errorf("%s failed. Noise function did not equal expected function", name)
 		}
 	}
 }
 
 func TestRandom2D(t *testing.T) {
+	rand := rand.New(rand.NewSource(42)).Float64
 	testCases := map[string]struct {
-		ExpectedFn func() float64
+		ExpectedFn noise.Function2D
 	}{
-		"multiple functions with same seed": {
-			ExpectedFn: rand.New(rand.NewSource(42)).Float64,
+		"basic": {
+			ExpectedFn: func(tx, ty float64) float64 {
+				return rand()
+			},
 		},
 	}
 
 	for name, testCase := range testCases {
-
-		random1 := generator.Random2D(42)
-		random2 := generator.Random2D(42)
-
-		for i := 0; i < 10; i++ {
-			expected := testCase.ExpectedFn()
-			if result := random1(1, 2); result != expected {
-				t.Errorf("'%s' failed. Expected function 1 iteration %d to be %v, received %v", name, i, expected, result)
-			}
-
-			if result := random2(1, 2); result != expected {
-				t.Errorf("'%s' failed. Expected function 1 iteration %d to be %v, received %v", name, i, expected, result)
-			}
+		noiseFunction := generator.Random2D(42)
+		if !noiseFunction.IsEqual(testCase.ExpectedFn) {
+			t.Errorf("%s failed. Noise function did not equal expected function", name)
 		}
 	}
 }

@@ -10,74 +10,49 @@ import (
 
 func TestSinusoid1D(t *testing.T) {
 	testCases := map[string]struct {
-		PhaseFn     noise.Function1D
-		Frequency   float64
-		InputParams []float64
-		Expected    []float64
+		PhaseFn    noise.Function1D
+		Frequency  float64
+		ExpectedFn noise.Function1D
 	}{
 		"constant phase function": {
 			PhaseFn: func(t float64) float64 {
 				return 1
 			},
-			Frequency:   3,
-			InputParams: []float64{-2, 0, 0.1, 1, 5000},
-			Expected: []float64{
-				math.Sin(2*math.Pi*3*-2 + 1),
-				math.Sin(2*math.Pi*3*0 + 1),
-				math.Sin(2*math.Pi*3*0.1 + 1),
-				math.Sin(2*math.Pi*3*1 + 1),
-				math.Sin(2*math.Pi*3*5000 + 1),
+			Frequency: 3,
+			ExpectedFn: func(t float64) float64 {
+				return math.Sin(2*math.Pi*3*t + 1)
 			},
 		},
 		"linear phase function": {
 			PhaseFn: func(t float64) float64 {
 				return t * 2
 			},
-			Frequency:   17.442,
-			InputParams: []float64{-2, 0, 0.1, 1, 5000},
-			Expected: []float64{
-				math.Sin(2*math.Pi*17.442*-2 - 4),
-				math.Sin(2*math.Pi*17.442*0 + 0),
-				math.Sin(2*math.Pi*17.442*0.1 + 0.2),
-				math.Sin(2*math.Pi*17.442*1 + 2),
-				math.Sin(2*math.Pi*17.442*5000 + 10000),
+			Frequency: 17.442,
+			ExpectedFn: func(t float64) float64 {
+				return math.Sin(2*math.Pi*17.442*t + (t * 2))
 			},
 		},
 	}
 
 	for name, testCase := range testCases {
-		noiseFn := transformer.Sinusoid1D(testCase.PhaseFn, testCase.Frequency)
-		for i, param := range testCase.InputParams {
-			if result := noiseFn(param); math.Abs(result-testCase.Expected[i]) > 0.00000000000001 {
-				t.Errorf("'%s' failed. Expected result %d to be %v, received %v", name, i, testCase.Expected, result)
-			}
+		noiseFunction := transformer.Sinusoid1D(testCase.PhaseFn, testCase.Frequency)
+		if !noiseFunction.IsEqual(testCase.ExpectedFn) {
+			t.Errorf("%s failed. Noise function did not equal expected function", name)
 		}
 	}
 }
 
 func TestSinusoid2D(t *testing.T) {
 	testCases := map[string]struct {
-		PhaseFn     noise.Function2D
-		Frequency   float64
-		InputParams [][2]float64
-		ExpectedFn  noise.Function2D
+		PhaseFn    noise.Function2D
+		Frequency  float64
+		ExpectedFn noise.Function2D
 	}{
 		"constant phase function": {
 			PhaseFn: func(tx, ty float64) float64 {
 				return 1
 			},
 			Frequency: 3,
-			InputParams: [][2]float64{
-				[2]float64{-1, -1},
-				[2]float64{-1, 0},
-				[2]float64{0, -1},
-				[2]float64{0, 0},
-				[2]float64{1, 1},
-				[2]float64{0.999, 1.001},
-				[2]float64{0, 500},
-				[2]float64{9999, 2244},
-				[2]float64{-33234, 0.0001},
-			},
 			ExpectedFn: func(tx, ty float64) float64 {
 				return math.Sin(2*math.Pi*3*(tx+ty) + 1)
 			},
@@ -87,17 +62,6 @@ func TestSinusoid2D(t *testing.T) {
 				return tx * 2
 			},
 			Frequency: 17.442,
-			InputParams: [][2]float64{
-				[2]float64{-1, -1},
-				[2]float64{-1, 0},
-				[2]float64{0, -1},
-				[2]float64{0, 0},
-				[2]float64{1, 1},
-				[2]float64{0.999, 1.001},
-				[2]float64{0, 500},
-				[2]float64{9999, 2244},
-				[2]float64{-33234, 0.0001},
-			},
 			ExpectedFn: func(tx, ty float64) float64 {
 				return math.Sin(2*math.Pi*17.442*(tx+ty) + (tx * 2))
 			},
@@ -105,13 +69,9 @@ func TestSinusoid2D(t *testing.T) {
 	}
 
 	for name, testCase := range testCases {
-		noiseFn := transformer.Sinusoid2D(testCase.PhaseFn, testCase.Frequency)
-		for i, params := range testCase.InputParams {
-			result := noiseFn(params[0], params[1])
-			expected := testCase.ExpectedFn(params[0], params[1])
-			if math.Abs(result-expected) > 0.00000000000001 {
-				t.Errorf("'%s' failed. Expected result %d to be %v, received %v", name, i, expected, result)
-			}
+		noiseFunction := transformer.Sinusoid2D(testCase.PhaseFn, testCase.Frequency)
+		if !noiseFunction.IsEqual(testCase.ExpectedFn) {
+			t.Errorf("%s failed. Noise function did not equal expected function", name)
 		}
 	}
 }
