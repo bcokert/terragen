@@ -181,6 +181,46 @@ func TestIsEqual(t *testing.T) {
 			Dimension: 2,
 			Expected:  true,
 		},
+		"zero dimensional": {
+			NoiseFn1: func(t []float64) float64 {
+				return 0
+			},
+			NoiseFn2: func(t []float64) float64 {
+				return 0
+			},
+			Dimension: 0,
+			Expected:  false,
+		},
+		"unsupported 3d": {
+			NoiseFn1: func(t []float64) float64 {
+				return 0
+			},
+			NoiseFn2: func(t []float64) float64 {
+				return -0
+			},
+			Dimension: 3,
+			Expected:  false,
+		},
+		"unsupported 4d": {
+			NoiseFn1: func(t []float64) float64 {
+				return 0
+			},
+			NoiseFn2: func(t []float64) float64 {
+				return -0
+			},
+			Dimension: 4,
+			Expected:  false,
+		},
+		"unsupported 10d": {
+			NoiseFn1: func(t []float64) float64 {
+				return 0
+			},
+			NoiseFn2: func(t []float64) float64 {
+				return -0
+			},
+			Dimension: 10,
+			Expected:  false,
+		},
 	}
 
 	for name, testCase := range testCases {
