@@ -9,7 +9,6 @@ import (
 	"github.com/bcokert/terragen/errors"
 	"github.com/bcokert/terragen/log"
 	"github.com/bcokert/terragen/model"
-	"github.com/bcokert/terragen/noise"
 	"github.com/bcokert/terragen/presets"
 )
 
@@ -62,27 +61,9 @@ func (server *Server) Noise(response http.ResponseWriter, request *http.Request)
 
 func (server *Server) getNoise(from, to []float64, resolution int, noiseFunction string) (output []byte, err error) {
 	response := model.NewNoise(noiseFunction)
-
-	dimension := noiseFunction[len(noiseFunction)-2:]
-	var noiseFn noise.Function
-	switch dimension {
-	case "1d":
-		func1d := presets.Spectral1DPresets[noiseFunction](server.Seed, []float64{1, 2, 4, 8, 16, 32, 64})
-		noiseFn = func(t []float64) float64 {
-			return func1d(t[0])
-		}
-	case "2d":
-		func2d := presets.Spectral2DPresets[noiseFunction](server.Seed, []float64{1, 2, 4, 8, 16, 32, 64})
-		noiseFn = func(t []float64) float64 {
-			return func2d(t[0], t[1])
-		}
-	default:
-		// TODO: Remove - cannot occur, but put here just until multidimensional noise is fully implemented
-		return []byte{}, fmt.Errorf("Illegal dimension on noise function %s: %s", noiseFunction, dimension)
-	}
+	noiseFn := presets.SpectralPresets[noiseFunction](server.Seed, []float64{1, 2, 4, 8, 16, 32, 64}) // noiseFunction has already been validated by this point
 
 	response.Generate(from, to, resolution, noiseFn)
-
 	return server.Marshal(response)
 }
 
@@ -129,13 +110,7 @@ func validateNoiseFunction(queryParams url.Values) (noiseFunction string, err er
 		return "", fmt.Errorf("Invalid. Expected a noise function preset or id")
 	}
 
-	for noiseFn, _ := range presets.Spectral1DPresets {
-		if noiseFunction == noiseFn {
-			return noiseFunction, nil
-		}
-	}
-
-	for noiseFn, _ := range presets.Spectral2DPresets {
+	for noiseFn, _ := range presets.SpectralPresets {
 		if noiseFunction == noiseFn {
 			return noiseFunction, nil
 		}

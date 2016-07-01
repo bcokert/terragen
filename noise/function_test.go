@@ -8,182 +8,183 @@ import (
 	"github.com/bcokert/terragen/noise"
 )
 
-func TestIsEqual1D(t *testing.T) {
+func TestIsEqual(t *testing.T) {
 	testCases := map[string]struct {
-		NoiseFn1 noise.Function1D
-		NoiseFn2 noise.Function1D
-		Expected bool
+		NoiseFn1  noise.Function
+		NoiseFn2  noise.Function
+		Dimension int
+		Expected  bool
 	}{
 		"constants": {
-			NoiseFn1: func(t float64) float64 {
+			NoiseFn1: func(t []float64) float64 {
 				return 1
 			},
-			NoiseFn2: func(t float64) float64 {
+			NoiseFn2: func(t []float64) float64 {
 				return 1
 			},
-			Expected: true,
+			Dimension: 1,
+			Expected:  true,
 		},
 		"linear": {
-			NoiseFn1: func(t float64) float64 {
-				return t
+			NoiseFn1: func(t []float64) float64 {
+				return t[0]
 			},
-			NoiseFn2: func(t float64) float64 {
-				return t
+			NoiseFn2: func(t []float64) float64 {
+				return t[0]
 			},
-			Expected: true,
+			Dimension: 1,
+			Expected:  true,
 		},
 		"complex": {
-			NoiseFn1: func(t float64) float64 {
-				return 2 * t / (48 + t) * math.Sin(t) / 3 * t
+			NoiseFn1: func(t []float64) float64 {
+				return 2 * t[0] / (48 + t[0]) * math.Sin(t[0]) / 3 * t[0]
 			},
-			NoiseFn2: func(t float64) float64 {
-				return 2 * t / (48 + t) * math.Sin(t) / 3 * t
+			NoiseFn2: func(t []float64) float64 {
+				return 2 * t[0] / (48 + t[0]) * math.Sin(t[0]) / 3 * t[0]
 			},
-			Expected: true,
+			Dimension: 1,
+			Expected:  true,
 		},
 		"different formulations": {
-			NoiseFn1: func(t float64) float64 {
-				return 2*t*6 + (4*t)/2
+			NoiseFn1: func(t []float64) float64 {
+				return 2*t[0]*6 + (4*t[0])/2
 			},
-			NoiseFn2: func(t float64) float64 {
-				return 14 * t
+			NoiseFn2: func(t []float64) float64 {
+				return 14 * t[0]
 			},
-			Expected: true,
+			Dimension: 1,
+			Expected:  true,
 		},
 		"almost equal": {
-			NoiseFn1: func(t float64) float64 {
-				return 2*t*6 + (4*t)/2
+			NoiseFn1: func(t []float64) float64 {
+				return 2*t[0]*6 + (4*t[0])/2
 			},
-			NoiseFn2: func(t float64) float64 {
-				return 14*t + 0.00000000001
+			NoiseFn2: func(t []float64) float64 {
+				return 14*t[0] + 0.00000000001
 			},
-			Expected: false,
+			Dimension: 1,
+			Expected:  false,
 		},
 		"same magnitude, different sign": {
-			NoiseFn1: func(t float64) float64 {
+			NoiseFn1: func(t []float64) float64 {
 				return -1
 			},
-			NoiseFn2: func(t float64) float64 {
+			NoiseFn2: func(t []float64) float64 {
 				return 1
 			},
-			Expected: false,
+			Dimension: 1,
+			Expected:  false,
 		},
 		"same but for one": {
-			NoiseFn1: func(t float64) float64 {
-				if t == -1 {
+			NoiseFn1: func(t []float64) float64 {
+				if t[0] == -1 {
 					return 9
 				}
-				return t
+				return t[0]
 			},
-			NoiseFn2: func(t float64) float64 {
-				return t
+			NoiseFn2: func(t []float64) float64 {
+				return t[0]
 			},
-			Expected: false,
+			Dimension: 1,
+			Expected:  false,
 		},
 		"differently signed zero": {
-			NoiseFn1: func(t float64) float64 {
+			NoiseFn1: func(t []float64) float64 {
 				return 0
 			},
-			NoiseFn2: func(t float64) float64 {
+			NoiseFn2: func(t []float64) float64 {
 				return -0
 			},
-			Expected: true,
+			Dimension: 1,
+			Expected:  true,
 		},
-	}
-
-	for name, testCase := range testCases {
-		result := testCase.NoiseFn1.IsEqual(testCase.NoiseFn2)
-		if result != testCase.Expected {
-			t.Errorf("'%s' failed. Expected %v, received %v", name, testCase.Expected, result)
-		}
-	}
-}
-
-func TestIsEqual2D(t *testing.T) {
-	testCases := map[string]struct {
-		NoiseFn1 noise.Function2D
-		NoiseFn2 noise.Function2D
-		Expected bool
-	}{
-		"constants": {
-			NoiseFn1: func(tx, ty float64) float64 {
+		"constants 2d": {
+			NoiseFn1: func(t []float64) float64 {
 				return 1
 			},
-			NoiseFn2: func(tx, ty float64) float64 {
+			NoiseFn2: func(t []float64) float64 {
 				return 1
 			},
-			Expected: true,
+			Dimension: 2,
+			Expected:  true,
 		},
-		"linear": {
-			NoiseFn1: func(tx, ty float64) float64 {
-				return tx + ty
+		"linear 2d": {
+			NoiseFn1: func(t []float64) float64 {
+				return t[0] + t[1]
 			},
-			NoiseFn2: func(tx, ty float64) float64 {
-				return tx + ty
+			NoiseFn2: func(t []float64) float64 {
+				return t[0] + t[1]
 			},
-			Expected: true,
+			Dimension: 2,
+			Expected:  true,
 		},
-		"complex": {
-			NoiseFn1: func(tx, ty float64) float64 {
-				return 2 * tx / (48 + ty) * math.Sin(ty) / 3 * tx
+		"complex 2d": {
+			NoiseFn1: func(t []float64) float64 {
+				return 2 * t[0] / (48 + t[1]) * math.Sin(t[1]) / 3 * t[0]
 			},
-			NoiseFn2: func(tx, ty float64) float64 {
-				return 2 * tx / (48 + ty) * math.Sin(ty) / 3 * tx
+			NoiseFn2: func(t []float64) float64 {
+				return 2 * t[0] / (48 + t[1]) * math.Sin(t[1]) / 3 * t[0]
 			},
-			Expected: true,
+			Dimension: 2,
+			Expected:  true,
 		},
-		"different formulations": {
-			NoiseFn1: func(tx, ty float64) float64 {
-				return 2*tx*6 + (4*ty)/2
+		"different formulations 2d": {
+			NoiseFn1: func(t []float64) float64 {
+				return 2*t[0]*6 + (4*t[1])/2
 			},
-			NoiseFn2: func(tx, ty float64) float64 {
-				return 12*tx + 2*ty
+			NoiseFn2: func(t []float64) float64 {
+				return 12*t[0] + 2*t[1]
 			},
-			Expected: true,
+			Dimension: 2,
+			Expected:  true,
 		},
-		"almost equal": {
-			NoiseFn1: func(tx, ty float64) float64 {
-				return 2*tx*6 + (4*ty)/2
+		"almost equal 2d": {
+			NoiseFn1: func(t []float64) float64 {
+				return 2*t[0]*6 + (4*t[1])/2
 			},
-			NoiseFn2: func(tx, ty float64) float64 {
-				return 12*tx + 2*ty + 0.00000000001
+			NoiseFn2: func(t []float64) float64 {
+				return 12*t[0] + 2*t[1] + 0.00000000001
 			},
-			Expected: false,
+			Dimension: 2,
+			Expected:  false,
 		},
-		"same magnitude, different sign": {
-			NoiseFn1: func(tx, ty float64) float64 {
+		"same magnitude, different sign 2d": {
+			NoiseFn1: func(t []float64) float64 {
 				return -1
 			},
-			NoiseFn2: func(tx, ty float64) float64 {
+			NoiseFn2: func(t []float64) float64 {
 				return 1
 			},
-			Expected: false,
+			Dimension: 2,
+			Expected:  false,
 		},
-		"same but for one": {
-			NoiseFn1: func(tx, ty float64) float64 {
-				if tx == -1 && ty == -1 {
+		"same but for one 2d": {
+			NoiseFn1: func(t []float64) float64 {
+				if t[0] == -1 && t[1] == -1 {
 					return 9.12
 				}
-				return tx + ty + 100
+				return t[0] + t[1] + 100
 			},
-			NoiseFn2: func(tx, ty float64) float64 {
-				return tx + ty + 100
+			NoiseFn2: func(t []float64) float64 {
+				return t[0] + t[1] + 100
 			},
-			Expected: false,
+			Dimension: 2,
+			Expected:  false,
 		},
-		"differently signed zero": {
-			NoiseFn1: func(tx, ty float64) float64 {
+		"differently signed zero 2d": {
+			NoiseFn1: func(t []float64) float64 {
 				return 0
 			},
-			NoiseFn2: func(tx, ty float64) float64 {
+			NoiseFn2: func(t []float64) float64 {
 				return -0
 			},
-			Expected: true,
+			Dimension: 2,
+			Expected:  true,
 		},
 	}
 
 	for name, testCase := range testCases {
-		result := testCase.NoiseFn1.IsEqual(testCase.NoiseFn2)
+		result := testCase.NoiseFn1.IsEqual(testCase.NoiseFn2, testCase.Dimension)
 		if result != testCase.Expected {
 			t.Errorf("'%s' failed. Expected %v, received %v", name, testCase.Expected, result)
 		}
