@@ -42,7 +42,7 @@ func TestSinusoid(t *testing.T) {
 			Frequency: 3,
 			Dimension: 2,
 			ExpectedFn: func(t []float64) float64 {
-				return math.Sin(2*math.Pi*3*(t[0]+t[1]) + 1)
+				return math.Sin(2*math.Pi*3*t[0]+1) * math.Sin(2*math.Pi*3*t[1]+1)
 			},
 		},
 		"linear phase function 2d": {
@@ -52,7 +52,7 @@ func TestSinusoid(t *testing.T) {
 			Frequency: 17.442,
 			Dimension: 2,
 			ExpectedFn: func(t []float64) float64 {
-				return math.Sin(2*math.Pi*17.442*(t[0]+t[1]) + (t[0]*2 + t[1]))
+				return math.Sin(2*math.Pi*17.442*t[0]+(t[0]*2+t[1])) * math.Sin(2*math.Pi*17.442*t[1]+(t[0]*2+t[1]))
 			},
 		},
 	}

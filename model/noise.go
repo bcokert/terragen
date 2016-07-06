@@ -30,42 +30,37 @@ func (noise *Noise) Generate(from, to []float64, resolution int, noiseFunction n
 	noise.RawNoise = map[string][]float64{}
 
 	// initialize storage for parameters and values
+	// for an n dimensional lattice, the number of points is range[dimension0]*resolution * range[dimension1]*resolution * ...
 	numParams := len(from)
 	numTotalSamples := 0
 	for i := range from {
-		numSamples := int(to[0]-from[0]+1) * resolution
-		numTotalSamples *= numSamples
-		noise.RawNoise["t"+strconv.Itoa(i+1)] = make([]float64, 0, numSamples)
+		numSamplesInDimension := int(to[i] - from[i])
+		numTotalSamples *= numSamplesInDimension
+	}
+	numTotalSamples *= resolution
+	for i := range from {
+		noise.RawNoise["t"+strconv.Itoa(i+1)] = make([]float64, 0, numTotalSamples)
 	}
 	noise.RawNoise["value"] = make([]float64, 0, numTotalSamples)
 
-	storeNoise := func(latPoints []float64) {
-		for res := 0; res < resolution; res++ {
-			params := make([]float64, 0, numParams)
-			resParam := float64(res) / float64(resolution)
-			for i, latPoint := range latPoints {
-				key := "t" + strconv.Itoa(i+1)
-				lat := latPoint + resParam
-				params = append(params, lat)
-				noise.RawNoise[key] = append(noise.RawNoise[key], lat)
-			}
-			noise.RawNoise["value"] = append(noise.RawNoise["value"], noiseFunction(params))
-		}
-	}
-
-	var eachLatticePoint func(latticePoints []float64, dimensionIndex int)
-	eachLatticePoint = func(latticePoints []float64, dimensionIndex int) {
+	var eachSample func(point []float64, dimensionIndex int)
+	eachSample = func(point []float64, dimensionIndex int) {
 		if dimensionIndex == numParams {
-			storeNoise(latticePoints)
+			for i, component := range point {
+				key := "t" + strconv.Itoa(i+1)
+				noise.RawNoise[key] = append(noise.RawNoise[key], component)
+			}
+			noise.RawNoise["value"] = append(noise.RawNoise["value"], noiseFunction(point))
 		} else {
-			for lat := from[dimensionIndex]; lat < to[dimensionIndex]; lat++ {
-				newLatticePoints := append(latticePoints[:], lat)
-				eachLatticePoint(newLatticePoints, dimensionIndex+1)
+			for i := from[dimensionIndex]; i < to[dimensionIndex]; i++ {
+				for j := 0; j < resolution; j++ {
+					eachSample(append(point[:], i+float64(j)/float64(resolution)), dimensionIndex+1)
+				}
 			}
 		}
 	}
 
-	eachLatticePoint([]float64{}, 0)
+	eachSample([]float64{}, 0)
 
 	noise.From = from
 	noise.To = to

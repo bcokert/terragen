@@ -12,10 +12,10 @@ type Transformer func(fn noise.Function, freq float64) noise.Function
 // Sinusoid transforms a noise function into a phase shifted sinusoid, at the specified frequency
 func Sinusoid(phaseFn noise.Function, freq float64) noise.Function {
 	return func(t []float64) float64 {
-		sum := 0.0
+		product := 1.0
 		for _, tx := range t {
-			sum += tx
+			product = product * math.Sin(2*math.Pi*freq*tx+phaseFn(t))
 		}
-		return math.Sin(2*math.Pi*freq*sum + phaseFn(t))
+		return product
 	}
 }
