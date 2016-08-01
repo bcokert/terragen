@@ -3,6 +3,8 @@ package vector
 import (
 	"fmt"
 	"math"
+
+	"github.com/bcokert/terragen/random"
 )
 
 // Vec2 Represents a 2d vector with simple operations
@@ -15,7 +17,7 @@ func NewVec2(x, y float64) Vec2 {
 }
 
 // RandomDirectionVec2 Creates a random normalized Vec2 with dimensions in the range [-1,1]
-func RandomDirectionVec2(random RandomSource) Vec2 {
+func RandomDirectionVec2(random random.Source) Vec2 {
 	a, b := (random.Float64()*2)-1, (random.Float64()*2)-1
 
 	// Ensure the vector can be normalized

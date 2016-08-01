@@ -10,6 +10,7 @@ import (
 	"github.com/bcokert/terragen/log"
 	"github.com/bcokert/terragen/model"
 	"github.com/bcokert/terragen/presets"
+	"github.com/bcokert/terragen/random"
 )
 
 // Noise endpoint
@@ -61,7 +62,7 @@ func (server *Server) Noise(response http.ResponseWriter, request *http.Request)
 
 func (server *Server) getNoise(from, to []float64, resolution int, noiseFunction string) (output []byte, err error) {
 	response := model.NewNoise(noiseFunction)
-	noiseFn := presets.SpectralPresets[noiseFunction](server.Seed, []float64{1, 2, 4, 8, 16, 32, 64}) // noiseFunction has already been validated by this point
+	noiseFn := presets.SpectralPresets[noiseFunction](random.NewDefaultSource(server.Seed), []float64{1, 2, 4, 8, 16, 32, 64}) // noiseFunction has already been validated by this point
 
 	response.Generate(from, to, resolution, noiseFn)
 	return server.Marshal(response)

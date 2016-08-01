@@ -12,6 +12,7 @@ import (
 	"github.com/bcokert/terragen/errors"
 	"github.com/bcokert/terragen/model"
 	"github.com/bcokert/terragen/presets"
+	"github.com/bcokert/terragen/random"
 	"github.com/bcokert/terragen/router"
 	"github.com/bcokert/terragen/testutils"
 )
@@ -207,7 +208,7 @@ func TestGetNoise_Success(t *testing.T) {
 			resolutionString := strconv.Itoa(params.Resolution)
 
 			url := fmt.Sprintf("/noise?from=%s&to=%s&resolution=%s&noiseFunction=%s", fromString, toString, resolutionString, testCase.PresetName)
-			noiseFunction := presets.SpectralPresets[testCase.PresetName](42, []float64{1, 2, 4, 8, 16, 32, 64})
+			noiseFunction := presets.SpectralPresets[testCase.PresetName](random.NewDefaultSource(42), []float64{1, 2, 4, 8, 16, 32, 64})
 			response := testutils.ExecuteTestRequest(router.CreateDefaultRouter(server), http.MethodGet, url, nil)
 
 			expectedResponse := model.NewNoise(testCase.PresetName)
@@ -226,7 +227,7 @@ func TestGetNoise_Success(t *testing.T) {
 			}
 
 			if !responseObject.IsEqual(expectedResponse) {
-				t.Errorf("%s failed with param set %d. Expected response '%#v', received '%#v'", name, i, url, expectedResponse, responseObject)
+				t.Errorf("%s failed with param set %d. Expected response '%#v', received '%#v'", name, i, expectedResponse, responseObject)
 			}
 		}
 	}

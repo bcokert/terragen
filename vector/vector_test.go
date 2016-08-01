@@ -1,9 +1,11 @@
 package vector_test
 
 import (
-	"github.com/bcokert/terragen/vector"
 	"math"
 	"testing"
+
+	"github.com/bcokert/terragen/random"
+	"github.com/bcokert/terragen/vector"
 )
 
 func TestNewVec2(t *testing.T) {
@@ -33,19 +35,19 @@ func TestNewVec2(t *testing.T) {
 
 func TestRandomDirectionVec2(t *testing.T) {
 	testCases := map[string]struct {
-		RandomSource vector.RandomSource
+		RandomSource random.Source
 		Expected     vector.Vec2
 	}{
 		"one component": {
-			RandomSource: &vector.RandomSourceMock{IncrementingResult: -0.5},
+			RandomSource: &random.IncrementingSourceMock{IncrementingResult: -0.5},
 			Expected:     vector.Vec2{0: 0, 1: 1},
 		},
 		"two component": {
-			RandomSource: &vector.RandomSourceMock{IncrementingResult: 1},
+			RandomSource: &random.IncrementingSourceMock{IncrementingResult: 1},
 			Expected:     vector.Vec2{0: 3 / math.Sqrt(34), 1: 5 / math.Sqrt(34)},
 		},
 		"converts zero vector to a direction vector": {
-			RandomSource: &vector.RandomSourceConstantMock{ConstantResult: 0.5},
+			RandomSource: &random.ConstantSourceMock{ConstantResult: 0.5},
 			Expected:     vector.Vec2{0: 1, 1: 0},
 		},
 	}

@@ -2,12 +2,9 @@ package vector
 
 import (
 	"fmt"
-)
 
-// RandomSource is an interface that provides a Float64 method that should return random floats between 0 and 1
-type RandomSource interface {
-	Float64() float64
-}
+	"github.com/bcokert/terragen/random"
+)
 
 // A GridCache is a cache for vectors keyed by 2d grid coordinates that guarantees a result even on misses
 type GridCache interface {
@@ -17,11 +14,11 @@ type GridCache interface {
 // DefaultRandomGridCache is a standard implementation of GridCache
 type DefaultRandomGridCache struct {
 	grid   map[string]Vec2
-	random RandomSource
+	random random.Source
 }
 
 // NewDefaultRandomGridCache creates a new DefaultRandomGridCache with the given random number generator
-func NewDefaultRandomGridCache(random RandomSource) GridCache {
+func NewDefaultRandomGridCache(random random.Source) GridCache {
 	cache := &DefaultRandomGridCache{random: random}
 
 	// Pre-populate the cache with 20x20 grid points, from -9 to 10 inclusive

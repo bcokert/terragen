@@ -1,8 +1,10 @@
 package vector_test
 
 import (
-	"github.com/bcokert/terragen/vector"
 	"testing"
+
+	"github.com/bcokert/terragen/random"
+	"github.com/bcokert/terragen/vector"
 )
 
 func TestDefaultRandomGridCache_Implements(t *testing.T) {
@@ -18,7 +20,7 @@ func TestDefaultRandomGridCache_Get(t *testing.T) {
 		}
 	}{
 		"cache hits": {
-			Cache: vector.NewDefaultRandomGridCache(&vector.RandomSourceMock{IncrementingResult: 0}),
+			Cache: vector.NewDefaultRandomGridCache(&random.IncrementingSourceMock{IncrementingResult: 0}),
 			Expected: []struct {
 				X, Y           int
 				ExpectedVector vector.Vec2
@@ -30,7 +32,7 @@ func TestDefaultRandomGridCache_Get(t *testing.T) {
 			},
 		},
 		"cache misses": {
-			Cache: vector.NewDefaultRandomGridCache(&vector.RandomSourceMock{IncrementingResult: 0}),
+			Cache: vector.NewDefaultRandomGridCache(&random.IncrementingSourceMock{IncrementingResult: 0}),
 			Expected: []struct {
 				X, Y           int
 				ExpectedVector vector.Vec2
@@ -40,7 +42,7 @@ func TestDefaultRandomGridCache_Get(t *testing.T) {
 			},
 		},
 		"misses then hits": {
-			Cache: vector.NewDefaultRandomGridCache(&vector.RandomSourceMock{IncrementingResult: 0}),
+			Cache: vector.NewDefaultRandomGridCache(&random.IncrementingSourceMock{IncrementingResult: 0}),
 			Expected: []struct {
 				X, Y           int
 				ExpectedVector vector.Vec2

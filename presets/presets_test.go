@@ -7,6 +7,7 @@ import (
 	"github.com/bcokert/terragen/generator"
 	"github.com/bcokert/terragen/noise"
 	"github.com/bcokert/terragen/presets"
+	"github.com/bcokert/terragen/random"
 	"github.com/bcokert/terragen/synthesizer"
 	"github.com/bcokert/terragen/transformer"
 )
@@ -27,7 +28,7 @@ func testSpectralPreset(t *testing.T, preset presets.Preset, weightExponent floa
 	}
 
 	for name, testCase := range testCases {
-		expectedGeneratorFn := generator.Random(42)
+		expectedGeneratorFn := generator.Random(random.NewDefaultSource(42))
 		expectedNoiseFnGenerator := func(freq float64) noise.Function {
 			return transformer.Sinusoid(expectedGeneratorFn, freq)
 		}
@@ -36,7 +37,7 @@ func testSpectralPreset(t *testing.T, preset presets.Preset, weightExponent floa
 		}
 		expectedSynthesizerFn := synthesizer.Octave(expectedNoiseFnGenerator, expectedWeightFn, testCase.Frequencies)
 
-		noiseFunction := preset(42, testCase.Frequencies)
+		noiseFunction := preset(random.NewDefaultSource(42), testCase.Frequencies)
 
 		for _, dimension := range testCase.Dimensions {
 			if !noiseFunction.IsEqual(expectedSynthesizerFn, dimension) {
