@@ -6,12 +6,12 @@ import (
 )
 
 func TestDefaultRandomGridCache_Implements(t *testing.T) {
-	var _ vector.RandomGridCache = &vector.DefaultRandomGridCache{}
+	var _ vector.GridCache = &vector.DefaultRandomGridCache{}
 }
 
 func TestDefaultRandomGridCache_Get(t *testing.T) {
 	testCases := map[string]struct {
-		Cache    vector.RandomGridCache
+		Cache    vector.GridCache
 		Expected []struct {
 			X, Y           int
 			ExpectedVector vector.Vec2
