@@ -7,10 +7,6 @@ import (
 )
 
 func TestNewInterpolator(t *testing.T) {
-	linearEasingFunc := func(t float64) float64 {
-		return t
-	}
-
 	testCases := map[string]struct {
 		Percentage, A, B float64
 		EasingFunc       interpolation.EasingFunction
@@ -20,42 +16,42 @@ func TestNewInterpolator(t *testing.T) {
 			Percentage: 0,
 			A:          4,
 			B:          5,
-			EasingFunc: linearEasingFunc,
+			EasingFunc: interpolation.LinearEase,
 			Expected:   4,
 		},
 		"one": {
 			Percentage: 1,
 			A:          4,
 			B:          5,
-			EasingFunc: linearEasingFunc,
+			EasingFunc: interpolation.LinearEase,
 			Expected:   5,
 		},
 		"greater than 1": {
 			Percentage: 1.7,
 			A:          4,
 			B:          5,
-			EasingFunc: linearEasingFunc,
+			EasingFunc: interpolation.LinearEase,
 			Expected:   5,
 		},
 		"less than 0": {
 			Percentage: -1.7,
 			A:          4,
 			B:          5,
-			EasingFunc: linearEasingFunc,
+			EasingFunc: interpolation.LinearEase,
 			Expected:   4,
 		},
 		"in between": {
 			Percentage: 0.5,
 			A:          4,
 			B:          5,
-			EasingFunc: linearEasingFunc,
+			EasingFunc: interpolation.LinearEase,
 			Expected:   4.5,
 		},
 		"close to 1": {
 			Percentage: 0.95,
 			A:          4,
 			B:          5,
-			EasingFunc: linearEasingFunc,
+			EasingFunc: interpolation.LinearEase,
 			Expected:   4.95,
 		},
 		"weird easing func": {

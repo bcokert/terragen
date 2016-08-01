@@ -1,9 +1,10 @@
 package interpolation_test
 
 import (
+	"testing"
+
 	"github.com/bcokert/terragen/interpolation"
 	"github.com/bcokert/terragen/testutils"
-	"testing"
 )
 
 func TestDampCubicEase(t *testing.T) {
@@ -31,6 +32,36 @@ func TestDampCubicEase(t *testing.T) {
 
 	for name, testCase := range testCases {
 		if result := interpolation.DampCubicEase(testCase.Input); !testutils.IsFloatEqual(testCase.Expected, result) {
+			t.Errorf("%s failed. Expected %v, received %v.", name, testCase.Expected, result)
+		}
+	}
+}
+
+func TestLinearEase(t *testing.T) {
+	testCases := map[string]struct {
+		Input    float64
+		Expected float64
+	}{
+		"zero": {
+			Input:    0,
+			Expected: 0,
+		},
+		"one": {
+			Input:    1,
+			Expected: 1,
+		},
+		"0.5": {
+			Input:    0.5,
+			Expected: 0.5,
+		},
+		"0.1": {
+			Input:    0.1,
+			Expected: 0.1,
+		},
+	}
+
+	for name, testCase := range testCases {
+		if result := interpolation.LinearEase(testCase.Input); !testutils.IsFloatEqual(testCase.Expected, result) {
 			t.Errorf("%s failed. Expected %v, received %v.", name, testCase.Expected, result)
 		}
 	}
