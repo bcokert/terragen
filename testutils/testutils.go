@@ -2,9 +2,9 @@ package testutils
 
 import (
 	"io"
+	"math"
 	"net/http"
 	"net/http/httptest"
-	"math"
 )
 
 // ExecuteTestRequest runs a request using the given router, and returns the response recorder
@@ -19,5 +19,5 @@ func ExecuteTestRequest(router http.Handler, method, url string, body io.Reader)
 
 // IsFloatEqual compares two floats to see if they're close enough to be considered equal
 func IsFloatEqual(a, b float64) bool {
-	return math.Abs(a - b) <= 0.00000000000001
+	return math.Abs(a-b) <= 0.00000000000001
 }

@@ -1,30 +1,30 @@
 package interpolation_test
 
 import (
-	"testing"
-	"github.com/bcokert/terragen/testutils"
 	"github.com/bcokert/terragen/interpolation"
+	"github.com/bcokert/terragen/testutils"
+	"testing"
 )
 
 func TestDampCubicEase(t *testing.T) {
-	testCases := map[string]struct{
-		Input float64
+	testCases := map[string]struct {
+		Input    float64
 		Expected float64
 	}{
 		"zero": {
-			Input: 0,
+			Input:    0,
 			Expected: 0,
 		},
 		"one": {
-			Input: 1,
+			Input:    1,
 			Expected: 1,
 		},
 		"0.5": {
-			Input: 0.5,
+			Input:    0.5,
 			Expected: 3*0.25 - 2*0.125,
 		},
 		"0.1": {
-			Input: 0.1,
+			Input:    0.1,
 			Expected: 3*0.01 - 2*0.001,
 		},
 	}

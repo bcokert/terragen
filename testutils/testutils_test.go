@@ -49,22 +49,22 @@ func TestExecuteTestRequest(t *testing.T) {
 
 func TestIsFloatEqual(t *testing.T) {
 	testCases := map[string]struct {
-		A, B float64
+		A, B     float64
 		Expected bool
 	}{
 		"zero": {
-			A: 0,
-			B: 0,
+			A:        0,
+			B:        0,
 			Expected: true,
 		},
 		"large": {
-			A: 623462362.23452345,
-			B: 623462362.23452345,
+			A:        623462362.23452345,
+			B:        623462362.23452345,
 			Expected: true,
 		},
 		"almost": {
-			A: 623462362.2345234,
-			B: 623462362.2345235,
+			A:        623462362.2345234,
+			B:        623462362.2345235,
 			Expected: false,
 		},
 	}
