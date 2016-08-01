@@ -3,6 +3,8 @@ package vector_test
 import (
 	"testing"
 
+	"math"
+
 	"github.com/bcokert/terragen/random"
 	"github.com/bcokert/terragen/vector"
 )
@@ -67,6 +69,40 @@ func TestDefaultRandomGridCache_Get(t *testing.T) {
 			if !result.IsEqual(inputs.ExpectedVector) {
 				t.Errorf("'%s' failed on inputs %v,%v. Expected %v, received %v", name, inputs.X, inputs.Y, inputs.ExpectedVector, result)
 			}
+		}
+	}
+}
+
+func TestMockGridCache_Get(t *testing.T) {
+	testCases := map[string]struct {
+		X, Y     int
+		Cache    *vector.MockGridCache
+		Expected vector.Vec2
+	}{
+		"basic": {
+			X:        1,
+			Y:        0,
+			Cache:    &vector.MockGridCache{},
+			Expected: vector.Vec2{1, 0},
+		},
+		"random": {
+			X:        52,
+			Y:        23,
+			Cache:    &vector.MockGridCache{},
+			Expected: vector.Vec2{52 / math.Sqrt(52*52+23*23), 23 / math.Sqrt(52*52+23*23)},
+		},
+		"zero": {
+			X:        0,
+			Y:        0,
+			Cache:    &vector.MockGridCache{},
+			Expected: vector.Vec2{1, 0},
+		},
+	}
+
+	for name, testCase := range testCases {
+		result := testCase.Cache.Get(testCase.X, testCase.Y)
+		if !testCase.Expected.IsEqual(result) {
+			t.Errorf("'%s' failed. Expected %v, received %v", name, testCase.Expected, result)
 		}
 	}
 }
