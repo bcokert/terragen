@@ -5,11 +5,13 @@ import (
 	"testing"
 
 	"github.com/bcokert/terragen/generator"
+	"github.com/bcokert/terragen/interpolation"
 	"github.com/bcokert/terragen/noise"
 	"github.com/bcokert/terragen/presets"
 	"github.com/bcokert/terragen/random"
 	"github.com/bcokert/terragen/synthesizer"
 	"github.com/bcokert/terragen/transformer"
+	"github.com/bcokert/terragen/vector"
 )
 
 func testSpectralPreset(t *testing.T, preset presets.Preset, weightExponent float64) {
@@ -65,4 +67,26 @@ func TestPink(t *testing.T) {
 
 func TestRed(t *testing.T) {
 	testSpectralPreset(t, presets.Red, -2)
+}
+
+func TestRawPerlin(t *testing.T) {
+	testCases := map[string]struct {
+		Frequencies []float64
+	}{
+		"smoke": {
+			Frequencies: []float64{1},
+		},
+	}
+
+	for name, testCase := range testCases {
+		expectedCache := vector.NewDefaultRandomGridCache(random.NewDefaultSource(42))
+		expectedInterpolator := interpolation.NewInterpolator(interpolation.DampCubicEase)
+		expectedGeneratorFn := generator.Perlin(expectedCache, expectedInterpolator)
+
+		noiseFunction := presets.RawPerlin(random.NewDefaultSource(42), testCase.Frequencies)
+
+		if !noiseFunction.IsEqual(expectedGeneratorFn, 2) {
+			t.Errorf("%s failed in dimension %d. Noise function did not equal expected function", name, 2)
+		}
+	}
 }

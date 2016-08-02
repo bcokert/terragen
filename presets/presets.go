@@ -4,10 +4,12 @@ import (
 	"math"
 
 	"github.com/bcokert/terragen/generator"
+	"github.com/bcokert/terragen/interpolation"
 	"github.com/bcokert/terragen/noise"
 	"github.com/bcokert/terragen/random"
 	"github.com/bcokert/terragen/synthesizer"
 	"github.com/bcokert/terragen/transformer"
+	"github.com/bcokert/terragen/vector"
 )
 
 // A Preset is a function that takes a seed and frequencies and produces a pre-constructed noise function
@@ -17,7 +19,7 @@ type Preset func(source random.Source, frequencies []float64) noise.Function
 // A Spectral Preset creates octave noise functions with randomly phased sinusoidal noise functions.
 // It combines octaves proportional to their frequencies, using a function f^X, where X is the weightExponent and corresponds to a normalized electromagnetic spectrum
 // 2 = violet, 1 = blue, 0 = white, -1 = pink, -2 = red
-var SpectralPresets map[string]Preset = map[string]Preset{
+var SpectralPresets = map[string]Preset{
 	"violet": Violet,
 	"blue":   Blue,
 	"white":  White,
@@ -62,4 +64,18 @@ func spectral(source random.Source, frequencies []float64, weightExponent float6
 	}
 
 	return synthesizer.Octave(noiseFunctionGenerator, weightFn, frequencies)
+}
+
+// LatticePresets is a map from preset names to Lattice Presets
+// A Lattice Preset creates lattice gradient noise from a grid of random vectors
+// It computes the influence of a given point at each of the surrounding grid coordinates, and then interpolates them to get a final result
+var LatticePresets = map[string]Preset{
+	"rawPerlin": RawPerlin,
+}
+
+// RawPerlin is a lattice preset that returns the output of a perlin generator, without modifying it
+func RawPerlin(source random.Source, frequencies []float64) noise.Function {
+	cache := vector.NewDefaultRandomGridCache(source)
+	interpolator := interpolation.NewInterpolator(interpolation.DampCubicEase)
+	return generator.Perlin(cache, interpolator)
 }

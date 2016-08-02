@@ -15,6 +15,7 @@ func Random(random random.Source) noise.Function {
 }
 
 // Perlin builds a noise function that returns Lattice Gradient noise values as described by Ken Perlin
+// TODO: Handle other dimensions than 2
 func Perlin(cache vector.GridCache, interpolator interpolation.Interpolator) noise.Function {
 	return func(t []float64) float64 {
 		// Find the surrounding grid points of the lattice

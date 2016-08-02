@@ -161,31 +161,37 @@ func TestGetNoise_MissingHTTPMethods(t *testing.T) {
 
 func TestGetNoise_Success(t *testing.T) {
 	testCases := map[string]struct {
-		PresetName string
-		Dimensions []int
+		PresetName       string
+		Dimensions       []int
+		PresetCollection map[string]presets.Preset
 	}{
-		"violet": {PresetName: "violet", Dimensions: []int{1, 2}},
-		"blue":   {PresetName: "blue", Dimensions: []int{1, 2}},
-		"white":  {PresetName: "white", Dimensions: []int{1, 2}},
-		"pink":   {PresetName: "pink", Dimensions: []int{1, 2}},
-		"red":    {PresetName: "red", Dimensions: []int{1, 2}},
+		"violet":    {PresetName: "violet", Dimensions: []int{1, 2}, PresetCollection: presets.SpectralPresets},
+		"blue":      {PresetName: "blue", Dimensions: []int{1, 2}, PresetCollection: presets.SpectralPresets},
+		"white":     {PresetName: "white", Dimensions: []int{1, 2}, PresetCollection: presets.SpectralPresets},
+		"pink":      {PresetName: "pink", Dimensions: []int{1, 2}, PresetCollection: presets.SpectralPresets},
+		"red":       {PresetName: "red", Dimensions: []int{1, 2}, PresetCollection: presets.SpectralPresets},
+		"rawPerlin": {PresetName: "rawPerlin", Dimensions: []int{2}, PresetCollection: presets.LatticePresets},
 	}
 
 	// For each preset, for each dimension, we have a set of test cases (aka sets of params)
-	testCaseParams := []struct {
+	testCaseParams := map[int][]struct {
 		From       []float64
 		To         []float64
 		Resolution int
 	}{
-		{From: []float64{-3}, To: []float64{-1}, Resolution: 4},
-		{From: []float64{-0}, To: []float64{6}, Resolution: 50},
-		{From: []float64{-12}, To: []float64{55}, Resolution: 1},
-		{From: []float64{-5}, To: []float64{-5}, Resolution: 2},
-		{From: []float64{-3, 0}, To: []float64{0, 5}, Resolution: 4},
-		{From: []float64{-1, -1}, To: []float64{0, 0}, Resolution: 50},
-		{From: []float64{0, 21}, To: []float64{1, 23}, Resolution: 1},
-		{From: []float64{55, 91}, To: []float64{55, 999}, Resolution: 2},
-		{From: []float64{-4, 7}, To: []float64{-2, 7}, Resolution: 2},
+		1: {
+			{From: []float64{-3}, To: []float64{-1}, Resolution: 4},
+			{From: []float64{-0}, To: []float64{6}, Resolution: 50},
+			{From: []float64{-12}, To: []float64{55}, Resolution: 1},
+			{From: []float64{-5}, To: []float64{-5}, Resolution: 2},
+		},
+		2: {
+			{From: []float64{-3, 0}, To: []float64{0, 5}, Resolution: 4},
+			{From: []float64{-1, -1}, To: []float64{0, 0}, Resolution: 50},
+			{From: []float64{0, 21}, To: []float64{1, 23}, Resolution: 1},
+			{From: []float64{55, 91}, To: []float64{55, 999}, Resolution: 2},
+			{From: []float64{-4, 7}, To: []float64{-2, 7}, Resolution: 2},
+		},
 	}
 
 	for name, testCase := range testCases {
@@ -194,40 +200,42 @@ func TestGetNoise_Success(t *testing.T) {
 			Marshal: json.Marshal,
 		}
 
-		for i, params := range testCaseParams {
-			froms := []string{}
-			for _, from := range params.From {
-				froms = append(froms, fmt.Sprintf("%v", from))
-			}
-			fromString := strings.Join(froms, ",")
-			tos := []string{}
-			for _, to := range params.To {
-				tos = append(tos, fmt.Sprintf("%v", to))
-			}
-			toString := strings.Join(tos, ",")
-			resolutionString := strconv.Itoa(params.Resolution)
+		for _, dimension := range testCase.Dimensions {
+			for i, params := range testCaseParams[dimension] {
+				froms := []string{}
+				for _, from := range params.From {
+					froms = append(froms, fmt.Sprintf("%v", from))
+				}
+				fromString := strings.Join(froms, ",")
+				tos := []string{}
+				for _, to := range params.To {
+					tos = append(tos, fmt.Sprintf("%v", to))
+				}
+				toString := strings.Join(tos, ",")
+				resolutionString := strconv.Itoa(params.Resolution)
 
-			url := fmt.Sprintf("/noise?from=%s&to=%s&resolution=%s&noiseFunction=%s", fromString, toString, resolutionString, testCase.PresetName)
-			noiseFunction := presets.SpectralPresets[testCase.PresetName](random.NewDefaultSource(42), []float64{1, 2, 4, 8, 16, 32, 64})
-			response := testutils.ExecuteTestRequest(router.CreateDefaultRouter(server), http.MethodGet, url, nil)
+				url := fmt.Sprintf("/noise?from=%s&to=%s&resolution=%s&noiseFunction=%s", fromString, toString, resolutionString, testCase.PresetName)
+				noiseFunction := testCase.PresetCollection[testCase.PresetName](random.NewDefaultSource(42), []float64{1, 2, 4, 8, 16, 32, 64})
+				response := testutils.ExecuteTestRequest(router.CreateDefaultRouter(server), http.MethodGet, url, nil)
 
-			expectedResponse := model.NewNoise(testCase.PresetName)
-			expectedResponse.Generate(params.From, params.To, params.Resolution, noiseFunction)
+				expectedResponse := model.NewNoise(testCase.PresetName)
+				expectedResponse.Generate(params.From, params.To, params.Resolution, noiseFunction)
 
-			responseObject := model.Noise{}
-			if response.Code != http.StatusOK {
-				t.Errorf("%s failed with param set %d. Expected code %d, received %d", name, i, http.StatusOK, response.Code)
-				t.Logf("Response: %s", response.Body.String())
-				continue
-			}
+				responseObject := model.Noise{}
+				if response.Code != http.StatusOK {
+					t.Errorf("%s failed with param set %d. Expected code %d, received %d", name, i, http.StatusOK, response.Code)
+					t.Logf("Response: %s", response.Body.String())
+					continue
+				}
 
-			if err := json.NewDecoder(response.Body).Decode(&responseObject); err != nil {
-				t.Errorf("%s failed with param set %d. Failed to decode response: %s", name, i, response.Body.String())
-				continue
-			}
+				if err := json.NewDecoder(response.Body).Decode(&responseObject); err != nil {
+					t.Errorf("%s failed with param set %d. Failed to decode response: %s", name, i, response.Body.String())
+					continue
+				}
 
-			if !responseObject.IsEqual(expectedResponse) {
-				t.Errorf("%s failed with param set %d. Expected response '%#v', received '%#v'", name, i, expectedResponse, responseObject)
+				if !responseObject.IsEqual(expectedResponse) {
+					t.Errorf("%s failed with param set %d. Expected response '%#v', received '%#v'", name, i, expectedResponse, responseObject)
+				}
 			}
 		}
 	}

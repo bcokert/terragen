@@ -26,6 +26,7 @@ func (server *Server) Noise(response http.ResponseWriter, request *http.Request)
 		var from, to []float64
 		var resolution int
 		var noiseFunction string
+		var preset presets.Preset
 		var err error
 		var jsonResponse []byte
 
@@ -44,12 +45,12 @@ func (server *Server) Noise(response http.ResponseWriter, request *http.Request)
 			return
 		}
 
-		if noiseFunction, err = validateNoiseFunction(queryParams); err != nil {
+		if noiseFunction, preset, err = validateNoiseFunctionAndRetrievePreset(queryParams); err != nil {
 			errors.WriteError(response, errors.ErrorWithCause("Noise - Invalid 'noiseFunction' param", err), http.StatusBadRequest)
 			return
 		}
 
-		if jsonResponse, err = server.getNoise(from, to, resolution, noiseFunction); err != nil {
+		if jsonResponse, err = server.getNoise(from, to, resolution, noiseFunction, preset); err != nil {
 			errors.WriteError(response, errors.ErrorWithCause("Noise - Failed to generate noise", err), http.StatusInternalServerError)
 			return
 		}
@@ -60,9 +61,9 @@ func (server *Server) Noise(response http.ResponseWriter, request *http.Request)
 	}
 }
 
-func (server *Server) getNoise(from, to []float64, resolution int, noiseFunction string) (output []byte, err error) {
+func (server *Server) getNoise(from, to []float64, resolution int, noiseFunction string, preset presets.Preset) ([]byte, error) {
 	response := model.NewNoise(noiseFunction)
-	noiseFn := presets.SpectralPresets[noiseFunction](random.NewDefaultSource(server.Seed), []float64{1, 2, 4, 8, 16, 32, 64}) // noiseFunction has already been validated by this point
+	noiseFn := preset(random.NewDefaultSource(server.Seed), []float64{1, 2, 4, 8, 16, 32, 64})
 
 	response.Generate(from, to, resolution, noiseFn)
 	return server.Marshal(response)
@@ -104,18 +105,24 @@ func validateResolution(queryParams url.Values) (resolution int, err error) {
 	return resolution, nil
 }
 
-func validateNoiseFunction(queryParams url.Values) (noiseFunction string, err error) {
+func validateNoiseFunctionAndRetrievePreset(queryParams url.Values) (noiseFunction string, preset presets.Preset, err error) {
 	noiseFunction = queryParams.Get("noiseFunction")
 
 	if noiseFunction == "" {
-		return "", fmt.Errorf("Invalid. Expected a noise function preset or id")
+		return "", nil, fmt.Errorf("Invalid. Expected a noise function preset or id")
 	}
 
-	for noiseFn, _ := range presets.SpectralPresets {
+	for noiseFn, preset := range presets.SpectralPresets {
 		if noiseFunction == noiseFn {
-			return noiseFunction, nil
+			return noiseFn, preset, nil
 		}
 	}
 
-	return "", errors.UnsupportedError("Loading Noise Functions by Id")
+	for noiseFn, preset := range presets.LatticePresets {
+		if noiseFunction == noiseFn {
+			return noiseFn, preset, nil
+		}
+	}
+
+	return "", nil, errors.UnsupportedError("Loading Noise Functions by Id")
 }
