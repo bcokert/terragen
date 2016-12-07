@@ -15,5 +15,5 @@ func main() {
 
 	server := controller.CreateDefaultServer()
 	r := router.CreateDefaultRouter(server)
-	stdLog.Fatal(http.ListenAndServe("localhost:8080/", r))
+	stdLog.Fatal(http.ListenAndServe("localhost:8080", r))
 }
