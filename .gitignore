@@ -7,3 +7,7 @@ build/
 
 # Ignore test artifacts
 .coverage-reports
+
+# Ignore dev files
+node_modules
+npm-debug.log

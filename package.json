@@ -1,0 +1,57 @@
+{
+  "name": "terragen",
+  "version": "0.7.0",
+  "description": "Terragen is a noise generation service with an accompanying UI.",
+  "scripts": {
+    "dev": "webpack-dev-server --debug --devtool eval-source-map --output-pathinfo --colors --port 1334",
+    "build": "rm -rf build/static && webpack -p",
+    "lint": "eslint . --fix --ext .js,.jsx"
+  },
+  "config": {
+    "pre-git": {
+      "pre-commit": [
+        "npm run lint"
+      ]
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bcokert/terragen.git"
+  },
+  "author": "Brandon Okert",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bcokert/terragen/issues"
+  },
+  "homepage": "https://github.com/bcokert/terragen#readme",
+  "dependencies": {
+    "classnames": "^2.2.5",
+    "eventemitter3": "^1.2.0",
+    "gl-matrix": "^2.3.2",
+    "plotly.js": "^1.12.0",
+    "react": "^15.1.0",
+    "react-dom": "^15.1.0",
+    "underscore": "^1.8.3"
+  },
+  "devDependencies": {
+    "babel-core": "^6.9.1",
+    "babel-loader": "^6.2.4",
+    "babel-preset-es2015": "^6.9.0",
+    "babel-preset-react": "^6.5.0",
+    "css-loader": "^0.23.1",
+    "es6-promise": "^3.2.1",
+    "eslint": "^2.11.1",
+    "eslint-plugin-react": "^5.1.1",
+    "file-loader": "^0.9.0",
+    "image-webpack-loader": "^2.0.0",
+    "json-loader": "^0.5.4",
+    "less": "^2.7.1",
+    "less-loader": "^2.2.3",
+    "pre-git": "^3.10.0",
+    "raw-loader": "^0.5.1",
+    "style-loader": "^0.13.1",
+    "url-loader": "^0.5.7",
+    "webpack": "^1.13.1",
+    "webpack-dev-server": "^1.14.1"
+  }
+}

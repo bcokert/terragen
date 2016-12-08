@@ -1,0 +1,63 @@
+.NoiseBrowser {
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: flex-start;
+  align-items: stretch;
+  align-content: flex-start;
+
+  box-sizing: border-box;
+  width: 100%;
+
+  padding: 10px 20px 60px 20px;
+
+  & > .-title {
+    flex: 0 1 auto;
+
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+    align-items: flex-end;
+    align-content: flex-start;
+
+    .x-label {
+      font-size: 18px;
+      font-weight: 500;
+    }
+  }
+
+  & > .-control {
+    flex: 0 1 auto;
+
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: flex-start;
+    align-items: flex-end;
+    align-content: flex-start;
+
+    overflow-x: hidden;
+
+    box-sizing: border-box;
+
+    &.-top {
+      margin: 0 0 6px 0;
+    }
+  }
+
+  & > .-errors {
+    flex: 0 1 auto;
+
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+    align-items: flex-start;
+    align-content: flex-start;
+
+    &>.-error {
+      color: #d30000;
+    }
+  }
+
+  & > .-plotArea {
+    flex: 0 1 auto;
+  }
+}

@@ -1,0 +1,22 @@
+@import "../../../color/color.less";
+
+.Button {
+  min-height: 32px;
+
+  margin: 0 8px 0 0;
+  outline: none;
+  border: none;
+
+  background-color: @colorUnfocusPrimary;
+
+  font-size: 12px;
+  font-weight: 500;
+
+  &:hover {
+    background-color: @colorFocusSecondary;
+  }
+
+  &:active {
+    background-color: @colorFocusPrimary;
+  }
+}

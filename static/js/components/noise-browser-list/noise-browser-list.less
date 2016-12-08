@@ -1,0 +1,46 @@
+.NoiseBrowserList {
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: flex-start;
+  align-items: stretch;
+
+  & > .-header {
+    flex: 0 0 auto;
+
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+    align-items: center;
+
+    box-sizing: border-box;
+    padding: 10px;
+    margin-bottom: 20px;
+
+    & > * {
+      flex: 0 0 auto;
+      padding-bottom: 8px;
+    }
+
+    & > *:last-child {
+      padding-bottom: 0;
+    }
+
+    & > .-title {
+      font-size: 22px;
+      font-weight: 500;
+    }
+
+    & > .-description {
+    }
+
+    & > .-componentList {
+      display: flex;
+      flex-flow: row wrap;
+      justify-content: flex-start;
+      align-items: flex-end;
+
+      box-sizing: border-box;
+      padding: 0 20px 0 20px;
+    }
+  }
+}

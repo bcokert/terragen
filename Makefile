@@ -17,3 +17,6 @@ view-coverage: ## Open coverage report in browser
 run: ## Build and run the project
 	@mkdir -p ./build
 	go build -o ./build/terragen && ./build/terragen
+
+deploy-web-local: ## Deploys the web server so that the service picks it up automatically
+	./bin/deploy-web-local.sh
