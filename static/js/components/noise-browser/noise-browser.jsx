@@ -4,7 +4,6 @@ var React = require("react");
 var Plotly = require("plotly.js");
 var Ajax = require("../../ajax/ajax");
 var TextField = require("../control/text-field/text-field.jsx");
-var _ = require("underscore");
 
 require("./noise-browser.less");
 
@@ -41,7 +40,7 @@ class NoiseBrowser extends React.Component {
     }
 
     componentDidMount() {
-        Plotly.plot(this._plotArea, [this.getPlot()], this.getLayout(), this.getConfig());
+        Plotly.plot(this.plotArea, [this.getPlot()], this.getLayout(), this.getConfig());
         this.fetchNoise();
     }
 
@@ -61,8 +60,8 @@ class NoiseBrowser extends React.Component {
             || previousState.t3 !== this.state.t3
             || previousState.value !== this.state.value
         ) {
-            Plotly.deleteTraces(this._plotArea, 0);
-            Plotly.addTraces(this._plotArea, this.getPlot());
+            Plotly.deleteTraces(this.plotArea, 0);
+            Plotly.addTraces(this.plotArea, this.getPlot());
         }
     }
 
@@ -72,13 +71,13 @@ class NoiseBrowser extends React.Component {
                 return {
                     margin: {l: 0, r: 0, t: 0, b: 0},
                     height: 300,
-                    width: this._plotArea.offsetWidth
+                    width: this.plotArea.offsetWidth
                 };
             case 2:
                 return {
                     margin: {l: 0, r: 0, t: 0, b: 0},
                     height: 700,
-                    width: this._plotArea.offsetWidth
+                    width: this.plotArea.offsetWidth
                 };
             default:
                 throw new Error("Unsupported dimension for noise browser, in getLayout");
@@ -183,7 +182,7 @@ class NoiseBrowser extends React.Component {
                 <div className="-errors">
                     {this.renderErrors()}
                 </div>
-                <div className="-plotArea" ref={node => this._plotArea = node}></div>
+                <div className="-plotArea" ref={node => this.plotArea = node}></div>
                 <div className="-control -bottom"></div>
             </div>
         );

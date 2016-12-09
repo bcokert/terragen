@@ -3,9 +3,9 @@
 class Ajax {
     /**
      * Returns a new url that has the given query params added to the request
-     * @param baseUrl string The base url to append to
-     * @param params object An object of query params. Will be properly formatted
-     * @return string
+     * @param {string} baseUrl The base url to append to
+     * @param {object} params An object of query params. Will be properly formatted
+     * @returns {string}
      */
     static addParams(baseUrl, params) {
         if (Object.keys(params).length === 0) {
@@ -17,7 +17,7 @@ class Ajax {
                 return param.map(paramToString).join(",");
             }
 
-            if (typeof param === "object" && object !== null) {
+            if (typeof param === "object" && param !== null) {
                 return Object.values(param).map(paramToString).join(",");
             }
 

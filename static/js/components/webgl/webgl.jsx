@@ -110,7 +110,9 @@ class WebGL extends React.Component {
         var gl;
         try {
             gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
-        } catch (e) {}
+        } catch (e) {
+            return undefined;
+        }
 
         return gl ? gl : undefined;
     }

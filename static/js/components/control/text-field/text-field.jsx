@@ -30,7 +30,7 @@ class TextField extends React.Component {
     }
 
     componentDidMount() {
-        this._onChangeDebounced = _.debounce(this.props.onChange, this.props.debounceTimeout);
+        this.onChangeDebounced = _.debounce(this.props.onChange, this.props.debounceTimeout);
     }
 
     onChange(e) {
@@ -39,7 +39,7 @@ class TextField extends React.Component {
             isValid: this.props.validate(newValue),
             value: newValue
         });
-        this._onChangeDebounced(newValue);
+        this.onChangeDebounced(newValue);
     }
 
     render() {
@@ -80,13 +80,13 @@ TextField.displayName = "Text Field";
 
 TextField.propTypes = {
     className: React.PropTypes.string,
-    debounceTimeout: React.PropTypes.number.isRequired,
+    debounceTimeout: React.PropTypes.number,
     label: React.PropTypes.string.isRequired,
-    onChange: React.PropTypes.func.isRequired,
-    placeholder: React.PropTypes.string.isRequired,
-    readOnly: React.PropTypes.bool.isRequired,
+    onChange: React.PropTypes.func,
+    placeholder: React.PropTypes.string,
+    readOnly: React.PropTypes.bool,
     validate: React.PropTypes.func,
-    value: React.PropTypes.string.isRequired
+    value: React.PropTypes.string
 };
 
 TextField.defaultProps = {
@@ -94,7 +94,7 @@ TextField.defaultProps = {
     placeholder: "",
     onChange: () => null,
     readOnly: false,
-    validate: value => true,
+    validate: () => true,
     value: ""
 };
 

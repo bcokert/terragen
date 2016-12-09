@@ -1,7 +1,6 @@
 "use strict";
 
 const RenderObject = require("./render-object");
-const RenderComponent = require("./render-component");
 
 const Rotatable = require("./render-components/rotateable");
 const Positionable = require("./render-components/positionable");
