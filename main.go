@@ -10,15 +10,27 @@ import (
 	"github.com/bcokert/terragen/log"
 	"github.com/bcokert/terragen/router"
 	"time"
+	"os"
 )
 
 func main() {
-	log.Info("Starting Terragen on localhost:8080/...")
+	port := os.Getenv("TERRAGEN_PORT")
+	if port == "" {
+		stdLog.Fatal("No legal port was provided. Please set the TERRAGEN_PORT variable.")
+	}
+
+	assetsDir := os.Getenv("TERRAGEN_STATIC_ASSETS")
+	if port == "" {
+		stdLog.Fatal("No static assets directory was provided. Please set the TERRAGEN_STATIC_ASSETS variable.")
+	}
 
 	server := controller.Server{
 		Seed:    time.Now().Unix(),
 		Marshal: json.Marshal,
 	}
-	r := router.CreateDefaultRouter(&server)
-	stdLog.Fatal(http.ListenAndServe("localhost:8080", r))
+
+	log.Info("Starting Terragen Service on port %s and asset directory %s", port, assetsDir)
+
+	r := router.CreateDefaultRouter(&server, assetsDir)
+	stdLog.Fatal(http.ListenAndServe(":" + port, r))
 }

@@ -9,11 +9,11 @@ import (
 )
 
 // CreateDefaultRouter returns a router with all the default routes configured
-func CreateDefaultRouter(server *controller.Server) http.Handler {
+func CreateDefaultRouter(server *controller.Server, assetsDir string) http.Handler {
 	router := http.NewServeMux()
 
 	router.HandleFunc("/static/", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "./build" + r.URL.Path)
+		http.ServeFile(w, r, assetsDir + r.URL.Path)
 	})
 
 	router.HandleFunc("/", middleware.TimedRequest(endpoint.Index, "Index"))
