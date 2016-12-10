@@ -20,7 +20,6 @@ The index action is special, and is used exclusively to serve the website.
 ```
 > make run
 # Serves up the backend on a local service - this service also served a website artifact, if one is available.
-# However, you should use the web dev server if developing the website
 ```
 
 ### Build Production Artifact
@@ -50,8 +49,8 @@ The web server is built separately from the backend service. The backend service
 
 ### Running local dev web server
 ```
-> yarn run dev
-# Serves up the frontend on a dev index file, address displayed in stdout
+> yarn dev
+# Runs a watcher that re-compiles the bundle whenever js changes. You can then access it via the dev server from 'make run'.
 ```
 
 ### Build Production Artifact

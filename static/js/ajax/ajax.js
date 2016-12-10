@@ -45,10 +45,6 @@ class Ajax {
             return Promise.reject(new Error(`Illegal url provided: '${url}'`));
         }
 
-        if (!/^((https?:\/\/)?[\w-]+(\.[\w-]+)*\.?(:\d+)?(\/\S*)?)/gi.test(url)) {
-            return Promise.reject(new Error(`Invalid url provided: '${url}'`));
-        }
-
         if (options.url.indexOf("?") === -1 && options.queryParams) {
             url = Ajax.addParams(url, options.queryParams);
         }

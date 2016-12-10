@@ -69,27 +69,27 @@ class App extends React.Component {
                 browserList={[{
                     dimension: 1,
                     displayName: "Red Noise",
-                    endpoint: "http://localhost:8080/noise",
+                    endpoint: "/noise",
                     noiseFunction: "red"
                 },{
                     dimension: 1,
                     displayName: "Pink Noise",
-                    endpoint: "http://localhost:8080/noise",
+                    endpoint: "/noise",
                     noiseFunction: "pink"
                 },{
                     dimension: 1,
                     displayName: "White Noise",
-                    endpoint: "http://localhost:8080/noise",
+                    endpoint: "/noise",
                     noiseFunction: "white"
                 },{
                     dimension: 1,
                     displayName: "Blue Noise",
-                    endpoint: "http://localhost:8080/noise",
+                    endpoint: "/noise",
                     noiseFunction: "blue"
                 },{
                     dimension: 1,
                     displayName: "Violet Noise",
-                    endpoint: "http://localhost:8080/noise",
+                    endpoint: "/noise",
                     noiseFunction: "violet"
                 }]}
                 description="Spectral Noise is created from random sinusoids of various frequencies, combined via a weighted sum, where the weights are related to the frequency"
@@ -107,27 +107,27 @@ class App extends React.Component {
                 browserList={[{
                     dimension: 2,
                     displayName: "Red Noise",
-                    endpoint: "http://localhost:8080/noise",
+                    endpoint: "/noise",
                     noiseFunction: "red"
                 },{
                     dimension: 2,
                     displayName: "Pink Noise",
-                    endpoint: "http://localhost:8080/noise",
+                    endpoint: "/noise",
                     noiseFunction: "pink"
                 },{
                     dimension: 2,
                     displayName: "White Noise",
-                    endpoint: "http://localhost:8080/noise",
+                    endpoint: "/noise",
                     noiseFunction: "white"
                 },{
                     dimension: 2,
                     displayName: "Blue Noise",
-                    endpoint: "http://localhost:8080/noise",
+                    endpoint: "/noise",
                     noiseFunction: "blue"
                 },{
                     dimension: 2,
                     displayName: "Violet Noise",
-                    endpoint: "http://localhost:8080/noise",
+                    endpoint: "/noise",
                     noiseFunction: "violet"
                 }]}
                 description="Spectral Noise is created from random sinusoids of various frequencies, combined via a weighted sum, where the weights are related to the frequency"
