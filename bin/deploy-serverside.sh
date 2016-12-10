@@ -20,7 +20,6 @@ fi
 mv build/static/main.js ./build/static/${TERRAGEN_JAVASCRIPT_BUNDLE}.js
 
 # Deploy the new artifacts to the service directory
-pwd
 sudo mv build/ ${SERVICE_DIRECTORY}
 
 # Deploy the configs

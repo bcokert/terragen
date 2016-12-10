@@ -1,9 +1,9 @@
 "use strict";
 
 var React = require("react");
-var Plotly = require("plotly.js");
 var Ajax = require("../../ajax/ajax");
 var TextField = require("../control/text-field/text-field.jsx");
+var LinePlotArea = require("../line-plot-area/line-plot-area");
 
 require("./noise-browser.less");
 
@@ -25,10 +25,6 @@ class NoiseBrowser extends React.Component {
             errors: []
         };
 
-        this.getLayout = this.getLayout.bind(this);
-        this.getPlot = this.getPlot.bind(this);
-        this.getConfig = this.getConfig.bind(this);
-
         this.fetchNoise = this.fetchNoise.bind(this);
 
         this.onChangeFrom = this.onChangeFrom.bind(this);
@@ -40,7 +36,6 @@ class NoiseBrowser extends React.Component {
     }
 
     componentDidMount() {
-        Plotly.plot(this.plotArea, [this.getPlot()], this.getLayout(), this.getConfig());
         this.fetchNoise();
     }
 
@@ -52,73 +47,6 @@ class NoiseBrowser extends React.Component {
             || previousState.noiseFunction !== this.state.noiseFunction
         ) {
             this.fetchNoise();
-        }
-
-        if (
-            previousState.t1 !== this.state.t1
-            || previousState.t2 !== this.state.t2
-            || previousState.t3 !== this.state.t3
-            || previousState.value !== this.state.value
-        ) {
-            Plotly.deleteTraces(this.plotArea, 0);
-            Plotly.addTraces(this.plotArea, this.getPlot());
-        }
-    }
-
-    getLayout() {
-        switch(this.props.dimension) {
-            case 1:
-                return {
-                    margin: {l: 0, r: 0, t: 0, b: 0},
-                    height: 300,
-                    width: this.plotArea.offsetWidth
-                };
-            case 2:
-                return {
-                    margin: {l: 0, r: 0, t: 0, b: 0},
-                    height: 700,
-                    width: this.plotArea.offsetWidth
-                };
-            default:
-                throw new Error("Unsupported dimension for noise browser, in getLayout");
-        }
-    }
-
-    getConfig() {
-        switch(this.props.dimension) {
-            case 1:
-                return {
-                    showLink: false,
-                    displayModeBar: false
-                };
-            case 2:
-                return {
-                    showLink: false,
-                    displayModeBar: false,
-                    scrollZoom: false
-                };
-            default:
-                throw new Error("Unsupported dimension for noise browser, in getConfig");
-        }
-    }
-
-    getPlot() {
-        switch(this.props.dimension) {
-            case 1:
-                return {
-                    x: this.state.t1,
-                    y: this.state.value,
-                    mode: "lines"
-                };
-            case 2:
-                return {
-                    x: this.state.t1,
-                    y: this.state.t2,
-                    z: this.state.value,
-                    type: "mesh3d"
-                };
-            default:
-                throw new Error("Unsupported dimension for noise browser, in getPlot");
         }
     }
 
@@ -152,7 +80,7 @@ class NoiseBrowser extends React.Component {
     }
 
     renderErrors() {
-        return this.state.errors.map(e => <span className="-error x-value">{e}</span>);
+        return this.state.errors.map(e => <span className="-error x-value" key={e} >{e}</span>);
     }
 
     onChangeFrom(newFrom) {
@@ -182,7 +110,7 @@ class NoiseBrowser extends React.Component {
                 <div className="-errors">
                     {this.renderErrors()}
                 </div>
-                <div className="-plotArea" ref={node => this.plotArea = node}></div>
+                <LinePlotArea height={300} width={window.innerWidth - 40} x={this.state.t1} y={this.state.value} />
                 <div className="-control -bottom"></div>
             </div>
         );
