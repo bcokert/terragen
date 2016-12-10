@@ -72,8 +72,10 @@ echo "Bundle will have the file name: ${JS_BUNDLE}.js"
 echo "Deploying server artifacts to ${HOST}"
 if [ ${DRY_RUN} = false ]; then
   scp -i ${PEM_FILE} -r build/ ${DEPLOY_USER}@${HOST}:/home/${DEPLOY_USER}
+  scp -i ${PEM_FILE} -r etc/ ${DEPLOY_USER}@${HOST}:/home/${DEPLOY_USER}
 else
   echo "DRY RUN: scp -i ${PEM_FILE} -r build/ ${DEPLOY_USER}@${HOST}:/home/${DEPLOY_USER}"
+  echo "DRY RUN: scp -i ${PEM_FILE} -r etc/ ${DEPLOY_USER}@${HOST}:/home/${DEPLOY_USER}"
 fi
 
 echo "Running local deploy script on ${HOST} with the ${ENVIRONMENT} config"

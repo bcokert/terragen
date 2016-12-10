@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 SERVICE_DIRECTORY="/usr/local/terragen"
+CONFIG_DIRECTORY="/etc/terragen"
 
 # Stop the running service if it exists
 if [ -e "running_pid" ]; then
@@ -19,7 +20,15 @@ fi
 mv build/static/main.js ./build/static/${TERRAGEN_JAVASCRIPT_BUNDLE}.js
 
 # Deploy the new artifacts to the service directory
+pwd
 sudo mv build/ ${SERVICE_DIRECTORY}
+
+# Deploy the configs
+sudo mkdir -p ${CONFIG_DIRECTORY}
+sudo mv etc/logrotate.conf ${CONFIG_DIRECTORY}/logrotate.conf
+sudo chown root:root ${CONFIG_DIRECTORY}/logrotate.conf
+sudo mv etc/crontab /etc/cron.d/terragen
+sudo chown root:root /etc/cron.d/terragen
 
 # Make sure port 80 is redirected to port 8080
 if [[ "$(sudo iptables -t nat --line-numbers -n -L | grep 'tcp dpt:80 redir ports 8080')" == "" ]]; then

@@ -1,0 +1,1 @@
+5 * * * * root logrotate /etc/terragen/logrotate.conf
