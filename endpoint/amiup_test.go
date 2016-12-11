@@ -24,7 +24,7 @@ func TestAmiup(t *testing.T) {
 		request, _ := http.NewRequest(http.MethodGet, "/amiup", nil)
 		recorder := httptest.NewRecorder()
 
-		router := router.CreateDefaultRouter(&controller.Server{})
+		router := router.CreateDefaultRouter(&controller.Server{}, ".")
 		router.ServeHTTP(recorder, request)
 
 		if code := recorder.Code; code != testCase.ExpectedCode {

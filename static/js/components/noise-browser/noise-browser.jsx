@@ -4,6 +4,7 @@ var React = require("react");
 var Ajax = require("../../ajax/ajax");
 var TextField = require("../control/text-field/text-field.jsx");
 var LinePlotArea = require("../line-plot-area/line-plot-area");
+var MeshPlotArea = require("../mesh-plot-area/mesh-plot-area");
 
 require("./noise-browser.less");
 
@@ -92,10 +93,25 @@ class NoiseBrowser extends React.Component {
     }
 
     onChangeResolution(newResolution) {
-        this.setState({resolution: newResolution});
+        this.setState({resolution: newResolution, errors: []});
     }
 
     render() {
+        var plotArea;
+        if (this.state.t2.length > 0) {
+            plotArea = (
+                <MeshPlotArea
+                    height={600}
+                    numx={(this.state.to.split(",")[0] - this.state.from.split(",")[0]) * this.state.resolution}
+                    numy={(this.state.to.split(",")[1] - this.state.from.split(",")[1]) * this.state.resolution}
+                    t1={this.state.t1} t2={this.state.t2} width={window.innerWidth - 40}
+                    y={this.state.value}
+                />
+            );
+        } else {
+            plotArea = <LinePlotArea height={300} width={window.innerWidth - 40} x={this.state.t1} y={this.state.value}/>;
+        }
+
         return (
             <div className="NoiseBrowser">
                 <div className="-title">
@@ -110,7 +126,7 @@ class NoiseBrowser extends React.Component {
                 <div className="-errors">
                     {this.renderErrors()}
                 </div>
-                <LinePlotArea height={300} width={window.innerWidth - 40} x={this.state.t1} y={this.state.value} />
+                {plotArea}
                 <div className="-control -bottom"></div>
             </div>
         );

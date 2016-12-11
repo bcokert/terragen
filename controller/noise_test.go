@@ -75,7 +75,7 @@ func TestGetNoise_InputValidation(t *testing.T) {
 			Seed:    42,
 			Marshal: json.Marshal,
 		}
-		response := testutils.ExecuteTestRequest(router.CreateDefaultRouter(server), http.MethodGet, testCase.Url, nil)
+		response := testutils.ExecuteTestRequest(router.CreateDefaultRouter(server, "."), http.MethodGet, testCase.Url, nil)
 
 		if response.Body.String() != testCase.ExpectedBody {
 			t.Errorf("%s failed. Expected body '%s', received '%s'", name, testCase.ExpectedBody, response.Body.String())
@@ -107,7 +107,7 @@ func TestGetNoise_Failure(t *testing.T) {
 				return []byte{}, fmt.Errorf("Failed to marshal man!")
 			},
 		}
-		response := testutils.ExecuteTestRequest(router.CreateDefaultRouter(server), http.MethodGet, testCase.Url, nil)
+		response := testutils.ExecuteTestRequest(router.CreateDefaultRouter(server, "."), http.MethodGet, testCase.Url, nil)
 
 		if response.Body.String() != testCase.ExpectedBody {
 			t.Errorf("%s failed. Expected body '%s', received '%s'", name, testCase.ExpectedBody, response.Body.String())
@@ -147,7 +147,7 @@ func TestGetNoise_MissingHTTPMethods(t *testing.T) {
 			Seed:    42,
 			Marshal: json.Marshal,
 		}
-		response := testutils.ExecuteTestRequest(router.CreateDefaultRouter(server), testCase.Method, "/noise", nil)
+		response := testutils.ExecuteTestRequest(router.CreateDefaultRouter(server, "."), testCase.Method, "/noise", nil)
 
 		if response.Body.String() != testCase.ExpectedBody {
 			t.Errorf("%s failed. Expected body '%s', received '%s'", name, testCase.ExpectedBody, response.Body.String())
@@ -216,7 +216,7 @@ func TestGetNoise_Success(t *testing.T) {
 
 				url := fmt.Sprintf("/noise?from=%s&to=%s&resolution=%s&noiseFunction=%s", fromString, toString, resolutionString, testCase.PresetName)
 				noiseFunction := testCase.PresetCollection[testCase.PresetName](random.NewDefaultSource(42), []float64{1, 2, 4, 8, 16, 32, 64})
-				response := testutils.ExecuteTestRequest(router.CreateDefaultRouter(server), http.MethodGet, url, nil)
+				response := testutils.ExecuteTestRequest(router.CreateDefaultRouter(server, "."), http.MethodGet, url, nil)
 
 				expectedResponse := model.NewNoise(testCase.PresetName)
 				expectedResponse.Generate(params.From, params.To, params.Resolution, noiseFunction)

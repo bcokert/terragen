@@ -9,7 +9,6 @@ class LinePlotArea extends React.Component {
         super(props);
 
         this.canvas = null;
-        this.context = null;
 
         this.componentDidMount = this.componentDidMount.bind(this);
         this.componentDidUpdate = this.componentDidUpdate.bind(this);
@@ -23,12 +22,12 @@ class LinePlotArea extends React.Component {
 
     componentDidUpdate() {
         // Get the context, and resize it in case the window has been resized
-        this.context = this.canvas.getContext("2d");
-        if (this.context.canvas.width !== this.context.canvas.clientWidth || this.context.canvas.height !== this.context.canvas.clientHeight) {
-            this.context.canvas.width = this.context.canvas.clientWidth;
-            this.context.canvas.height = this.context.canvas.clientHeight;
+        const context = this.canvas.getContext("2d");
+        if (context.canvas.width !== context.canvas.clientWidth || context.canvas.height !== context.canvas.clientHeight) {
+            context.canvas.width = context.canvas.clientWidth;
+            context.canvas.height = context.canvas.clientHeight;
         }
-        this.context.clearRect(0, 0, this.context.canvas.width, this.context.canvas.height);
+        context.clearRect(0, 0, context.canvas.width, context.canvas.height);
 
         // Short circuit if there's nothing to draw
         var values = this.props.y;
@@ -51,30 +50,30 @@ class LinePlotArea extends React.Component {
         var yScaleFactor = halfHeight / (maxAbs * 1.03);
 
         // Draw a light line through the center
-        this.context.lineWidth = 1;
-        this.context.strokeStyle = "#ccc";
-        this.context.beginPath();
-        this.context.moveTo(0, halfHeight);
-        this.context.lineTo(this.props.width, halfHeight);
-        this.context.stroke();
+        context.lineWidth = 1;
+        context.strokeStyle = "#ccc";
+        context.beginPath();
+        context.moveTo(0, halfHeight);
+        context.lineTo(this.props.width, halfHeight);
+        context.stroke();
 
         // Draw lines between the points pairwise, and a background line at the start of every interval
         for (i = 1; i < values.length; i++) {
             if (this.props.x[i] % 1 === 0) {
-                this.context.lineWidth = 1;
-                this.context.strokeStyle = "#ccc";
-                this.context.beginPath();
-                this.context.moveTo(this.props.x[i] * xScaleFactor, 0);
-                this.context.lineTo(this.props.x[i] * xScaleFactor, this.props.height);
-                this.context.stroke();
+                context.lineWidth = 1;
+                context.strokeStyle = "#ccc";
+                context.beginPath();
+                context.moveTo(this.props.x[i] * xScaleFactor, 0);
+                context.lineTo(this.props.x[i] * xScaleFactor, this.props.height);
+                context.stroke();
             }
 
-            this.context.lineWidth = 2;
-            this.context.strokeStyle = "#23c";
-            this.context.beginPath();
-            this.context.moveTo(this.props.x[i - 1] * xScaleFactor, halfHeight - values[i - 1] * yScaleFactor);
-            this.context.lineTo(this.props.x[i] * xScaleFactor, halfHeight - values[i] * yScaleFactor);
-            this.context.stroke();
+            context.lineWidth = 2;
+            context.strokeStyle = "#23c";
+            context.beginPath();
+            context.moveTo(this.props.x[i - 1] * xScaleFactor, halfHeight - values[i - 1] * yScaleFactor);
+            context.lineTo(this.props.x[i] * xScaleFactor, halfHeight - values[i] * yScaleFactor);
+            context.stroke();
         }
     }
 
@@ -83,7 +82,7 @@ class LinePlotArea extends React.Component {
     }
 }
 
-LinePlotArea.displayName = "LinePlotArea";
+LinePlotArea.displayName = "MeshPlotArea";
 
 LinePlotArea.propTypes = {
     height: React.PropTypes.number,

@@ -1294,13 +1294,13 @@ dateformat@^1.0.11:
     get-stdin "^4.0.1"
     meow "^3.3.0"
 
-debug@2.2.0, debug@^2.1.1, debug@~2.2.0:
+debug@2.2.0, debug@^2.1.1, debug@^2.2.0, debug@~2.2.0:
   version "2.2.0"
   resolved "http://npm.hootops.com:8081/artifactory/api/npm/npm-virtual/debug/-/debug-2.2.0.tgz#f87057e995b1a1f6ae6a4960664137bc56f039da"
   dependencies:
     ms "0.7.1"
 
-debug@2.3.3, debug@^2.2.0:
+debug@2.3.3:
   version "2.3.3"
   resolved "http://npm.hootops.com:8081/artifactory/api/npm/npm-virtual/debug/-/debug-2.3.3.tgz#40c453e67e6e13c901ddec317af8986cda9eff8c"
   dependencies:
@@ -3710,7 +3710,7 @@ postcss@^5.0.10, postcss@^5.0.11, postcss@^5.0.12, postcss@^5.0.13, postcss@^5.0
     source-map "^0.5.6"
     supports-color "^3.1.2"
 
-pre-git@^3.10.0:
+pre-git@^3.12.0:
   version "3.12.0"
   resolved "http://npm.hootops.com:8081/artifactory/api/npm/npm-virtual/pre-git/-/pre-git-3.12.0.tgz#8291899a15ba86f9cdaa8ca180e47096deff8dc3"
   dependencies:
@@ -4488,6 +4488,10 @@ tempfile@^1.0.0:
 text-table@~0.2.0:
   version "0.2.0"
   resolved "http://npm.hootops.com:8081/artifactory/api/npm/npm-virtual/text-table/-/text-table-0.2.0.tgz#7f5ee823ae805207c00af2df4a84ec3fcfa570b4"
+
+three@^0.82.1:
+  version "0.82.1"
+  resolved "http://npm.hootops.com:8081/artifactory/api/npm/npm-virtual/three/-/three-0.82.1.tgz#f63c3730971520c54479e3627d370d764a4a8383"
 
 through2-filter@^2.0.0:
   version "2.0.0"
