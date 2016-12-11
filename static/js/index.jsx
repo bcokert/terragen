@@ -48,12 +48,16 @@ class App extends React.Component {
         return (
             <div className="-mainPage">
                 <div className="-column">
-                    <p className="-title">1D</p>
+                    <p className="-title">Spectral 1D</p>
                     <Button onClick={() => this.changePage("Spectral1D")}>Spectral Noise 1D</Button>
                 </div>
                 <div className="-column">
-                    <p className="-title">2D</p>
+                    <p className="-title">Spectral 2D</p>
                     <Button onClick={() => this.changePage("Spectral2D")}>Spectral Noise 2D</Button>
+                </div>
+                <div className="-column">
+                    <p className="-title">Lattice 2D</p>
+                    <Button onClick={() => this.changePage("Lattice2D")}>Lattice Noise 2D</Button>
                 </div>
                 <div className="-column">
                     <p className="-title">WebGl</p>
@@ -129,12 +133,35 @@ class App extends React.Component {
                     displayName: "Violet Noise",
                     endpoint: "/noise",
                     noiseFunction: "violet"
+                },{
+                    dimension: 2,
+                    displayName: "Raw Perlin Noise",
+                    endpoint: "/noise",
+                    noiseFunction: "rawPerlin"
                 }]}
                 description="Spectral Noise is created from random sinusoids of various frequencies, combined via a weighted sum, where the weights are related to the frequency"
                 generator="Random"
                 presetCollectionName="Spectral Noise"
                 synthesizer="Octave"
                 transformer="Sinusoid"
+            />
+        );
+    }
+
+    renderLattice2DList() {
+        return (
+            <NoiseBrowserList
+                browserList={[{
+                    dimension: 2,
+                    displayName: "Raw Perlin Noise",
+                    endpoint: "/noise",
+                    noiseFunction: "rawPerlin"
+                }]}
+                description="Lattice noise is created by starting with a base n dimensional grid (or lattice) of noisy data, then interpolating values between grid points."
+                generator="Perlin"
+                presetCollectionName="Lattice Noise"
+                synthesizer="N/A"
+                transformer="N/A"
             />
         );
     }
@@ -154,6 +181,9 @@ class App extends React.Component {
                 break;
             case "Spectral2D":
                 page = this.renderSpectral2DList();
+                break;
+            case "Lattice2D":
+                page = this.renderLattice2DList();
                 break;
             case "WebGLDemo":
                 page = this.renderWebGLDemo();

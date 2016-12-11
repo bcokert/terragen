@@ -8,6 +8,7 @@ import (
 	"github.com/bcokert/terragen/noise"
 	"github.com/bcokert/terragen/random"
 	"github.com/bcokert/terragen/vector"
+	"math"
 )
 
 func TestRandom(t *testing.T) {
@@ -65,8 +66,8 @@ func TestPerlin(t *testing.T) {
 
 			topLeft := [2]int{int(a), int(b)}
 			topRight := [2]int{int(a) + 1, int(b)}
-			botLeft := [2]int{int(a), int(b) - 1}
-			botRight := [2]int{int(a) + 1, int(b) - 1}
+			botLeft := [2]int{int(a), int(b) + 1}
+			botRight := [2]int{int(a) + 1, int(b) + 1}
 
 			tl := vector.NewVec2(a-float64(topLeft[0]), b-float64(topLeft[1]))
 			tr := vector.NewVec2(a-float64(topRight[0]), b-float64(topRight[1]))
@@ -78,9 +79,9 @@ func TestPerlin(t *testing.T) {
 			ibl := bl.Dot(testCase.Cache.Get(botLeft[0], botLeft[1]))
 			ibr := br.Dot(testCase.Cache.Get(botRight[0], botRight[1]))
 
-			avgAB := testCase.Interpolator(a-float64(topLeft[0]), itl, itr)
-			avgCD := testCase.Interpolator(a-float64(topLeft[0]), ibl, ibr)
-			return testCase.Interpolator(b-float64(topLeft[1]-1), avgCD, avgAB)
+			avgAB := testCase.Interpolator(math.Abs(a-float64(topLeft[0])), itl, itr)
+			avgCD := testCase.Interpolator(math.Abs(a-float64(topLeft[0])), ibl, ibr)
+			return testCase.Interpolator(math.Abs(b-float64(topLeft[1])), avgAB, avgCD)
 		}
 
 		if !testNoiseFunction.IsEqual(expectedNoiseFunction, 2) {
