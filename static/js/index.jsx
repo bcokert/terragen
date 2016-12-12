@@ -133,11 +133,6 @@ class App extends React.Component {
                     displayName: "Violet Noise",
                     endpoint: "/noise",
                     noiseFunction: "violet"
-                },{
-                    dimension: 2,
-                    displayName: "Raw Perlin Noise",
-                    endpoint: "/noise",
-                    noiseFunction: "rawPerlin"
                 }]}
                 description="Spectral Noise is created from random sinusoids of various frequencies, combined via a weighted sum, where the weights are related to the frequency"
                 generator="Random"
