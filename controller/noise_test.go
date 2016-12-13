@@ -92,11 +92,15 @@ func TestGetNoise_InputValidation(t *testing.T) {
 			ExpectedBody: `{"error": "Invalid param: (NoiseFunction must be a valid preset)"}`,
 			ExpectedCode: http.StatusBadRequest,
 		},
+		"invalid seed": {
+			Url:          "/noise?from=15&to=52&resolution=51&noiseFunction=white&seed=banana",
+			ExpectedBody: `{"error": "Invalid param: (Seed must be a positive integer)"}`,
+			ExpectedCode: http.StatusBadRequest,
+		},
 	}
 
 	for name, testCase := range testCases {
 		server := &controller.Server{
-			Seed:    42,
 			Marshal: json.Marshal,
 		}
 		response := testutils.ExecuteTestRequest(router.CreateDefaultRouter(server, "."), http.MethodGet, testCase.Url, nil)
@@ -126,7 +130,6 @@ func TestGetNoise_Failure(t *testing.T) {
 
 	for name, testCase := range testCases {
 		server := &controller.Server{
-			Seed: 42,
 			Marshal: func(v interface{}) ([]byte, error) {
 				return []byte{}, fmt.Errorf("Failed to marshal man!")
 			},
@@ -180,7 +183,6 @@ func TestGetNoise_Success(t *testing.T) {
 
 	for name, testCase := range testCases {
 		server := &controller.Server{
-			Seed:    42,
 			Marshal: json.Marshal,
 		}
 
@@ -198,7 +200,7 @@ func TestGetNoise_Success(t *testing.T) {
 				toString := strings.Join(tos, ",")
 				resolutionString := strconv.Itoa(params.Resolution)
 
-				url := fmt.Sprintf("/noise?from=%s&to=%s&resolution=%s&noiseFunction=%s", fromString, toString, resolutionString, testCase.PresetName)
+				url := fmt.Sprintf("/noise?from=%s&to=%s&resolution=%s&noiseFunction=%s&seed=42", fromString, toString, resolutionString, testCase.PresetName)
 				noiseFunction := testCase.PresetCollection[testCase.PresetName](random.NewDefaultSource(42), []float64{1, 2, 4, 8, 16, 32, 64})
 				response := testutils.ExecuteTestRequest(router.CreateDefaultRouter(server, "."), http.MethodGet, url, nil)
 

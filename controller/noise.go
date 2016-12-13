@@ -12,6 +12,7 @@ import (
 	"github.com/bcokert/terragen/presets"
 	"github.com/bcokert/terragen/random"
 	"github.com/julienschmidt/httprouter"
+	"time"
 )
 
 // Noise endpoint
@@ -29,7 +30,7 @@ func (server *Server) Noise(response http.ResponseWriter, request *http.Request,
 
 	// Generate noise from the given params and preset
 	noise := model.NewNoise(params.PresetName)
-	noiseFn := params.Preset(random.NewDefaultSource(server.Seed), []float64{1, 2, 4, 8, 16, 32, 64})
+	noiseFn := params.Preset(random.NewDefaultSource(params.Seed), []float64{1, 2, 4, 8, 16, 32, 64})
 	noise.Generate(params.From, params.To, params.Resolution, noiseFn)
 
 	// Write the result
@@ -48,6 +49,7 @@ type NoiseQueryParams struct {
 	Resolution int
 	PresetName string
 	Preset     presets.Preset
+	Seed 	   int64
 }
 
 func validateNoiseParams(params url.Values) (response NoiseQueryParams, err error) {
@@ -55,6 +57,7 @@ func validateNoiseParams(params url.Values) (response NoiseQueryParams, err erro
 	to := params.Get("to")
 	resolution := params.Get("resolution")
 	noiseFunction := params.Get("noiseFunction")
+	seed := params.Get("seed")
 
 	// Check for missing params
 	if from == "" {
@@ -107,6 +110,15 @@ func validateNoiseParams(params url.Values) (response NoiseQueryParams, err erro
 	response.Preset = searchPresets(noiseFunction)
 	if response.Preset == nil {
 		return NoiseQueryParams{}, errs.New("NoiseFunction must be a valid preset")
+	}
+
+	// Validate seed, or generate if missing
+	if seed == "" {
+		response.Seed = time.Now().Unix()
+	} else {
+		if response.Seed, err = strconv.ParseInt(seed, 10, 0); err != nil {
+			return NoiseQueryParams{}, errs.New("Seed must be a positive integer")
+		}
 	}
 
 	return response, nil

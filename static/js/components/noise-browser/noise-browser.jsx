@@ -19,6 +19,7 @@ class NoiseBrowser extends React.Component {
             to: [3,3,2].slice(0,props.dimension).join(","),
             resolution: String([40, 20][props.dimension-1]),
             noiseFunction: props.initialNoiseFunction,
+            seed: "",
 
             errors: []
         };
@@ -28,6 +29,7 @@ class NoiseBrowser extends React.Component {
         this.onChangeFrom = this.onChangeFrom.bind(this);
         this.onChangeTo = this.onChangeTo.bind(this);
         this.onChangeResolution = this.onChangeResolution.bind(this);
+        this.onChangeSeed = this.onChangeSeed.bind(this);
 
         this.componentDidMount = this.componentDidMount.bind(this);
         this.componentDidUpdate = this.componentDidUpdate.bind(this);
@@ -43,6 +45,7 @@ class NoiseBrowser extends React.Component {
             || previousState.to !== this.state.to
             || previousState.resolution !== this.state.resolution
             || previousState.noiseFunction !== this.state.noiseFunction
+            || previousState.seed !== this.state.seed
         ) {
             this.fetchNoise();
         }
@@ -56,7 +59,8 @@ class NoiseBrowser extends React.Component {
                 from: this.state.from,
                 to: this.state.to,
                 resolution: this.state.resolution,
-                noiseFunction: this.state.noiseFunction
+                noiseFunction: this.state.noiseFunction,
+                seed: this.state.seed
             }
         }).then(response => {
             if (response.values) {
@@ -87,7 +91,11 @@ class NoiseBrowser extends React.Component {
     }
 
     onChangeResolution(newResolution) {
-        this.setState({resolution: newResolution, errors: []});
+        this.setState({resolution: newResolution});
+    }
+
+    onChangeSeed(newSeed) {
+        this.setState({seed: newSeed});
     }
 
     render() {
@@ -123,6 +131,7 @@ class NoiseBrowser extends React.Component {
                     <TextField label="To" onChange={this.onChangeTo} validate={v => v.split(",").length === this.props.dimension && v.split(",").map(n => Math.floor(parseFloat(n))).join(",").length === v.length} value={this.state.to}/>
                     <TextField label="Resolution" onChange={this.onChangeResolution} validate={v => !isNaN(v) && String(parseInt(v)).length === v.length} value={this.state.resolution}/>
                     <TextField label="NoiseFunction" readOnly value={this.state.noiseFunction}/>
+                    <TextField label="Seed" onChange={this.onChangeSeed} validate={v => !isNaN(v) && (v === "" || String(parseInt(v)).length === v.length)} value={this.state.seed}/>
                 </div>
                 <div className="-errors">
                     {this.renderErrors()}

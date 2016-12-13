@@ -7,12 +7,10 @@ import (
 	"encoding/json"
 	"github.com/bcokert/terragen/controller"
 	"github.com/bcokert/terragen/router"
-	"time"
 )
 
 func TestCreateDefaultRouter(t *testing.T) {
 	var r http.Handler = router.CreateDefaultRouter(&controller.Server{
-		Seed:    time.Now().Unix(),
 		Marshal: json.Marshal,
 	}, ".")
 

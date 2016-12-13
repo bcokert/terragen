@@ -10,7 +10,6 @@ import (
 	"github.com/bcokert/terragen/log"
 	"github.com/bcokert/terragen/router"
 	"os"
-	"time"
 )
 
 func main() {
@@ -25,7 +24,6 @@ func main() {
 	}
 
 	server := controller.Server{
-		Seed:    time.Now().Unix(),
 		Marshal: json.Marshal,
 	}
 
