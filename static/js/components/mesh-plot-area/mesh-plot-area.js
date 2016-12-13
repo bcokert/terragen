@@ -54,10 +54,10 @@ class MeshPlotArea extends React.Component {
         this.renderer.setSize(this.canvas.clientWidth, this.canvas.clientHeight);
 
         // Find the largest absolute value for scaling. We scale by the furthest value from the "ground" plane.
-        var maxAbs = this.props.y[0];
-        for (var i = 0; i < this.props.y.length; i++) {
-            if (Math.abs(this.props.y[i]) > maxAbs) {
-                maxAbs = Math.abs(this.props.y[i]);
+        var maxAbs = this.props.values[0];
+        for (var i = 0; i < this.props.values.length; i++) {
+            if (Math.abs(this.props.values[i]) > maxAbs) {
+                maxAbs = Math.abs(this.props.values[i]);
             }
         }
 
@@ -65,8 +65,8 @@ class MeshPlotArea extends React.Component {
         var aspectRatio = this.props.numx / this.props.numy;
         var geometry = new Three.PlaneBufferGeometry(100 * aspectRatio, 100, this.props.numx - 1, this.props.numy - 1);
         var vertices = geometry.attributes.position.array;
-        for (i = 0; i < this.props.y.length; i++) {
-            vertices[i * 3 + 2] = (this.props.y[i] / maxAbs) * 10;
+        for (i = 0; i < this.props.values.length; i++) {
+            vertices[i * 3 + 2] = (this.props.values[i] / maxAbs) * 10;
         }
         geometry.rotateZ(-Math.PI / 4);
         geometry.rotateX(-Math.PI / 4);
@@ -89,20 +89,16 @@ MeshPlotArea.propTypes = {
     height: React.PropTypes.number,
     numx: React.PropTypes.number,
     numy: React.PropTypes.number,
-    t1: React.PropTypes.arrayOf(React.PropTypes.number),
-    t2: React.PropTypes.arrayOf(React.PropTypes.number),
-    width: React.PropTypes.number,
-    y: React.PropTypes.arrayOf(React.PropTypes.number)
+    values: React.PropTypes.arrayOf(React.PropTypes.number),
+    width: React.PropTypes.number
 };
 
 MeshPlotArea.defaultProps = {
     height: 600,
     numx: 0,
     numy: 0,
-    t1: [],
-    t2: [],
     width: 800,
-    y: []
+    values: []
 };
 
 module.exports = MeshPlotArea;

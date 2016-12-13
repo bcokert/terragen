@@ -75,11 +75,11 @@ class WebGL extends React.Component {
                     if (isMouseDragging && mouseDragStartCoords) {
                         if (!inputState[InputManager.KEY_TO_CODE["shift"]]) {
                             var dx = mouseDragStartCoords.x - coords.x;
-                            var dy = mouseDragStartCoords.y - coords.y;
+                            var dy = mouseDragStartCoords.values - coords.values;
                             GLMatrix.mat4.rotate(cameraRotationMatrix, cameraRotationMatrix, dx / 300, [0, 1, 0]);
                             GLMatrix.mat4.rotate(cameraRotationMatrix, cameraRotationMatrix, dy / 300, [1, 0, 0]);
                             mouseDragStartCoords.x = coords.x;
-                            mouseDragStartCoords.y = coords.y;
+                            mouseDragStartCoords.values = coords.values;
                         }
                     }
                 });

@@ -13,13 +13,10 @@ class NoiseBrowser extends React.Component {
         super(props);
 
         this.state = {
-            t1: [],
-            t2: [],
-            t3: [],
             value: [],
 
             from: [0,0,0].slice(0,props.dimension).join(","),
-            to: [5,2,2].slice(0,props.dimension).join(","),
+            to: [3,3,2].slice(0,props.dimension).join(","),
             resolution: String([40, 20][props.dimension-1]),
             noiseFunction: props.initialNoiseFunction,
 
@@ -62,12 +59,9 @@ class NoiseBrowser extends React.Component {
                 noiseFunction: this.state.noiseFunction
             }
         }).then(response => {
-            if (response.rawNoise && typeof response.rawNoise === "object") {
+            if (response.values) {
                 this.setState({
-                    t1: response.rawNoise.t1 || [],
-                    t2: response.rawNoise.t2 || [],
-                    t3: response.rawNoise.t3 || [],
-                    value: response.rawNoise.value || [],
+                    value: response.values || [],
                     errors: []
                 });
             } else {
@@ -98,18 +92,25 @@ class NoiseBrowser extends React.Component {
 
     render() {
         var plotArea;
-        if (this.state.t2.length > 0) {
+        if (this.state.from.split(",").length == 2) {
             plotArea = (
                 <MeshPlotArea
                     height={600}
                     numx={(this.state.to.split(",")[0] - this.state.from.split(",")[0]) * this.state.resolution}
                     numy={(this.state.to.split(",")[1] - this.state.from.split(",")[1]) * this.state.resolution}
-                    t1={this.state.t1} t2={this.state.t2} width={window.innerWidth - 40}
-                    y={this.state.value}
+                    values={this.state.value}
+                    width={window.innerWidth - 40}
                 />
             );
         } else {
-            plotArea = <LinePlotArea height={300} width={window.innerWidth - 40} x={this.state.t1} y={this.state.value}/>;
+            plotArea = (
+                <LinePlotArea
+                    height={300}
+                    resolution={parseInt(this.state.resolution, 10)}
+                    values={this.state.value}
+                    width={window.innerWidth - 40}
+                />
+            );
         }
 
         return (

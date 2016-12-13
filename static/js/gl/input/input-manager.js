@@ -91,17 +91,17 @@ const InputManager = () => {
 
     window.addEventListener("mousedown", e => {
         instance.KEY_TO_CODE["mousedown"] = Date.now();
-        instance.emit("mousedown", {x: e.clientX, y: e.clientY});
+        instance.emit("mousedown", {x: e.clientX, values: e.clientY});
     });
 
     window.addEventListener("mousemove", e => {
         instance.KEY_TO_CODE["mousemove"] = Date.now();
-        instance.emit("mousemove", {x: e.clientX, y: e.clientY});
+        instance.emit("mousemove", {x: e.clientX, values: e.clientY});
     });
 
     window.addEventListener("mouseup", e => {
         instance.KEY_TO_CODE["mouseup"] = Date.now();
-        instance.emit("mouseup", {x: e.clientX, y: e.clientY});
+        instance.emit("mouseup", {x: e.clientX, values: e.clientY});
     });
 
     return instance;

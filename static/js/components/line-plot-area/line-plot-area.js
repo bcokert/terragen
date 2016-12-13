@@ -30,7 +30,7 @@ class LinePlotArea extends React.Component {
         context.clearRect(0, 0, context.canvas.width, context.canvas.height);
 
         // Short circuit if there's nothing to draw
-        var values = this.props.y;
+        var values = this.props.values;
         if (values.length === 0) {
             return;
         }
@@ -44,7 +44,7 @@ class LinePlotArea extends React.Component {
         }
 
         // Calculate graph sizes and scaling factors
-        var logicalWidth = this.props.x[this.props.x.length - 1] - this.props.x[0];
+        var logicalWidth = this.props.values.length;
         var xScaleFactor = this.props.width / logicalWidth;
         var halfHeight = this.props.height / 2;
         var yScaleFactor = halfHeight / (maxAbs * 1.03);
@@ -59,20 +59,20 @@ class LinePlotArea extends React.Component {
 
         // Draw lines between the points pairwise, and a background line at the start of every interval
         for (i = 1; i < values.length; i++) {
-            if (this.props.x[i] % 1 === 0) {
+            if (i % this.props.resolution === 0) {
                 context.lineWidth = 1;
                 context.strokeStyle = "#ccc";
                 context.beginPath();
-                context.moveTo(this.props.x[i] * xScaleFactor, 0);
-                context.lineTo(this.props.x[i] * xScaleFactor, this.props.height);
+                context.moveTo(i * xScaleFactor, 0);
+                context.lineTo(i * xScaleFactor, this.props.height);
                 context.stroke();
             }
 
             context.lineWidth = 2;
             context.strokeStyle = "#23c";
             context.beginPath();
-            context.moveTo(this.props.x[i - 1] * xScaleFactor, halfHeight - values[i - 1] * yScaleFactor);
-            context.lineTo(this.props.x[i] * xScaleFactor, halfHeight - values[i] * yScaleFactor);
+            context.moveTo((i - 1) * xScaleFactor, halfHeight - values[i - 1] * yScaleFactor);
+            context.lineTo(i * xScaleFactor, halfHeight - values[i] * yScaleFactor);
             context.stroke();
         }
     }
@@ -86,16 +86,16 @@ LinePlotArea.displayName = "MeshPlotArea";
 
 LinePlotArea.propTypes = {
     height: React.PropTypes.number,
-    width: React.PropTypes.number,
-    x: React.PropTypes.arrayOf(React.PropTypes.number),
-    y: React.PropTypes.arrayOf(React.PropTypes.number)
+    resolution: React.PropTypes.number,
+    values: React.PropTypes.arrayOf(React.PropTypes.number),
+    width: React.PropTypes.number
 };
 
 LinePlotArea.defaultProps = {
     height: 300,
+    resolution: 1,
     width: 800,
-    x: [],
-    y: []
+    values: []
 };
 
 module.exports = LinePlotArea;

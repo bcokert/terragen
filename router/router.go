@@ -13,7 +13,7 @@ import (
 func CreateDefaultRouter(server *controller.Server, assetsDir string) *httprouter.Router {
 	router := httprouter.New()
 
-	router.GET("/static/", func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	router.GET("/static/*path", func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		http.ServeFile(w, r, assetsDir+r.URL.Path)
 	})
 
