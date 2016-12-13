@@ -2,14 +2,13 @@ package endpoint
 
 import (
 	"fmt"
+	"github.com/julienschmidt/httprouter"
 	"net/http"
 	"os"
 )
 
-var _ http.HandlerFunc = Amiup
-
 // Index returns the browser webpage that acts as a basic client of the rest of the service
-func Index(response http.ResponseWriter, request *http.Request) {
+func Index(response http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
 	html := `
 		<!DOCTYPE html>
 		<html><head><meta charset="utf-8"><title>Terragen</title></head>
@@ -26,5 +25,5 @@ func Index(response http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	fmt.Fprintf(response, html, bundleHash + ".js")
+	fmt.Fprintf(response, html, bundleHash+".js")
 }

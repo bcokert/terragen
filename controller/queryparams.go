@@ -1,30 +1,27 @@
 package controller
 
 import (
-	"fmt"
-	"net/url"
 	"strconv"
 	"strings"
 )
 
-// ParseFloatArrayParam tries to parse the given query param into an array of floats
-// It lets the user handle the case where it's empty/not present
-func ParseFloatArrayParam(queryParams url.Values, key string) ([]float64, error) {
-	values := queryParams.Get(key)
-	floats := make([]float64, 0, 3)
+// ParseIntArrayParam tries to parse the given query param into an array of integers
+// If it can't, it always returns an empty list
+func ParseIntArray(v string) []int {
+	ints := make([]int, 0, 3)
 
-	if values == "" {
-		return floats, nil
+	if v == "" {
+		return []int{}
 	}
 
-	for _, value := range strings.Split(values, ",") {
-		num, err := strconv.ParseFloat(value, 64)
+	for _, value := range strings.Split(v, ",") {
+		num, err := strconv.Atoi(value)
 		if err == nil {
-			floats = append(floats, num)
+			ints = append(ints, num)
 		} else {
-			return []float64{}, fmt.Errorf("GetFloatArrayParam: failed to parse a float '%s' in the array: (%s)", value, err.Error())
+			return []int{}
 		}
 	}
 
-	return floats, nil
+	return ints
 }

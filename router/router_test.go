@@ -4,10 +4,10 @@ import (
 	"net/http"
 	"testing"
 
+	"encoding/json"
 	"github.com/bcokert/terragen/controller"
 	"github.com/bcokert/terragen/router"
 	"time"
-	"encoding/json"
 )
 
 func TestCreateDefaultRouter(t *testing.T) {

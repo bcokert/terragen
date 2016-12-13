@@ -12,8 +12,8 @@ import (
 // Noise represents generated noise, typically from GetNoise
 type Noise struct {
 	RawNoise      map[string][]float64 `json:"rawNoise"`
-	From          []float64            `json:"from"`
-	To            []float64            `json:"to"`
+	From          []int                `json:"from"`
+	To            []int                `json:"to"`
 	Resolution    int                  `json:"resolution"`
 	NoiseFunction string               `json:"noiseFunction"`
 }
@@ -26,7 +26,7 @@ func NewNoise(noiseFunction string) *Noise {
 }
 
 // Generate populates the RawNoise and related fields of this noise, by iterating over the range and calling the given noise function
-func (noise *Noise) Generate(from, to []float64, resolution int, noiseFunction noise.Function) {
+func (noise *Noise) Generate(from, to []int, resolution int, noiseFunction noise.Function) {
 	noise.RawNoise = map[string][]float64{}
 
 	// initialize storage for parameters and values
@@ -34,7 +34,7 @@ func (noise *Noise) Generate(from, to []float64, resolution int, noiseFunction n
 	numParams := len(from)
 	numTotalSamples := 0
 	for i := range from {
-		numSamplesInDimension := int(to[i] - from[i])
+		numSamplesInDimension := to[i] - from[i]
 		numTotalSamples *= numSamplesInDimension
 	}
 	numTotalSamples *= resolution
@@ -54,7 +54,7 @@ func (noise *Noise) Generate(from, to []float64, resolution int, noiseFunction n
 		} else {
 			for i := from[dimensionIndex]; i < to[dimensionIndex]; i++ {
 				for j := 0; j < resolution; j++ {
-					eachSample(append(point[:], i+float64(j)/float64(resolution)), dimensionIndex+1)
+					eachSample(append(point[:], float64(i)+float64(j)/float64(resolution)), dimensionIndex+1)
 				}
 			}
 		}

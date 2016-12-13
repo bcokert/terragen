@@ -9,21 +9,22 @@ import (
 
 	"github.com/bcokert/terragen/log"
 	"github.com/bcokert/terragen/middleware"
+	"github.com/julienschmidt/httprouter"
 )
 
 func TestTimedRequest(t *testing.T) {
 	testCases := map[string]struct {
-		Handler          http.HandlerFunc
+		Handler          httprouter.Handle
 		ExpectedLogRegex string
 	}{
 		"3ms Handler": {
-			Handler: func(w http.ResponseWriter, r *http.Request) {
+			Handler: func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 				time.Sleep(3000000)
 			},
 			ExpectedLogRegex: `INFO: MyHandler took [3-4]\.\d*ms`,
 		},
 		"Failing Handler": {
-			Handler: func(w http.ResponseWriter, r *http.Request) {
+			Handler: func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 				time.Sleep(1000000)
 				w.WriteHeader(500)
 			},
@@ -38,8 +39,8 @@ func TestTimedRequest(t *testing.T) {
 		request, _ := http.NewRequest(http.MethodGet, "/", nil)
 		recorder := httptest.NewRecorder()
 
-		router := http.NewServeMux()
-		router.HandleFunc("/", middleware.TimedRequest(testCase.Handler, "MyHandler"))
+		router := httprouter.New()
+		router.GET("/", middleware.TimedRequest(testCase.Handler, "MyHandler"))
 		router.ServeHTTP(recorder, request)
 
 		output := log.FlushTestLogger()

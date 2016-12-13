@@ -9,8 +9,8 @@ import (
 	"github.com/bcokert/terragen/controller"
 	"github.com/bcokert/terragen/log"
 	"github.com/bcokert/terragen/router"
-	"time"
 	"os"
+	"time"
 )
 
 func main() {
@@ -32,5 +32,5 @@ func main() {
 	log.Info("Starting Terragen Service on port %s and asset directory %s", port, assetsDir)
 
 	r := router.CreateDefaultRouter(&server, assetsDir)
-	stdLog.Fatal(http.ListenAndServe(":" + port, r))
+	stdLog.Fatal(http.ListenAndServe(":"+port, r))
 }

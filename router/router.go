@@ -6,21 +6,22 @@ import (
 	"github.com/bcokert/terragen/controller"
 	"github.com/bcokert/terragen/endpoint"
 	"github.com/bcokert/terragen/middleware"
+	"github.com/julienschmidt/httprouter"
 )
 
 // CreateDefaultRouter returns a router with all the default routes configured
-func CreateDefaultRouter(server *controller.Server, assetsDir string) http.Handler {
-	router := http.NewServeMux()
+func CreateDefaultRouter(server *controller.Server, assetsDir string) *httprouter.Router {
+	router := httprouter.New()
 
-	router.HandleFunc("/static/", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, assetsDir + r.URL.Path)
+	router.GET("/static/", func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+		http.ServeFile(w, r, assetsDir+r.URL.Path)
 	})
 
-	router.HandleFunc("/", middleware.TimedRequest(endpoint.Index, "Index"))
+	router.GET("/", middleware.TimedRequest(endpoint.Index, "Index"))
 
-	router.HandleFunc("/amiup", middleware.TimedRequest(endpoint.Amiup, "Amiup"))
+	router.GET("/amiup", middleware.TimedRequest(endpoint.Amiup, "Amiup"))
 
-	router.HandleFunc("/noise", middleware.TimedRequest(server.Noise, "Noise"))
+	router.GET("/noise", middleware.TimedRequest(server.Noise, "Noise"))
 
 	return router
 }
