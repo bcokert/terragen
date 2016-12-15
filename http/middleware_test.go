@@ -1,4 +1,4 @@
-package middleware_test
+package http_test
 
 import (
 	"net/http"
@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/bcokert/terragen/log"
-	"github.com/bcokert/terragen/middleware"
+	tghttp "github.com/bcokert/terragen/http"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -40,7 +40,7 @@ func TestTimedRequest(t *testing.T) {
 		recorder := httptest.NewRecorder()
 
 		router := httprouter.New()
-		router.GET("/", middleware.TimedRequest(testCase.Handler, "MyHandler"))
+		router.GET("/", tghttp.TimedRequest(testCase.Handler, "MyHandler"))
 		router.ServeHTTP(recorder, request)
 
 		output := log.FlushTestLogger()

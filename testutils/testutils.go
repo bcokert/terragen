@@ -1,21 +1,8 @@
 package testutils
 
 import (
-	"io"
 	"math"
-	"net/http"
-	"net/http/httptest"
 )
-
-// ExecuteTestRequest runs a request using the given router, and returns the response recorder
-func ExecuteTestRequest(router http.Handler, method, url string, body io.Reader) *httptest.ResponseRecorder {
-	response := httptest.NewRecorder()
-	request, _ := http.NewRequest(method, url, body)
-
-	router.ServeHTTP(response, request)
-
-	return response
-}
 
 // IsFloatEqual compares two floats to see if they're close enough to be considered equal
 func IsFloatEqual(a, b float64) bool {

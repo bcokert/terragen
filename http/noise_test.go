@@ -1,22 +1,21 @@
-package controller_test
+package http_test
 
 import (
-	"encoding/json"
-	"fmt"
 	"net/http"
-	"strconv"
-	"strings"
 	"testing"
 
-	"github.com/bcokert/terragen/controller"
-	"github.com/bcokert/terragen/model"
-	"github.com/bcokert/terragen/presets"
+	tghttp "github.com/bcokert/terragen/http"
+	"net/http/httptest"
+	"fmt"
+	"strings"
 	"github.com/bcokert/terragen/random"
-	"github.com/bcokert/terragen/router"
-	"github.com/bcokert/terragen/testutils"
+	"encoding/json"
+	"github.com/bcokert/terragen/presets"
+	"strconv"
+	"github.com/bcokert/terragen/model"
 )
 
-func TestGetNoise_InputValidation(t *testing.T) {
+func TestHandleNoise_InputValidation(t *testing.T) {
 	testCases := map[string]struct {
 		Url          string
 		ExpectedBody string
@@ -99,54 +98,22 @@ func TestGetNoise_InputValidation(t *testing.T) {
 		},
 	}
 
-	for name, testCase := range testCases {
-		server := &controller.Server{
-			Marshal: json.Marshal,
-		}
-		response := testutils.ExecuteTestRequest(router.CreateDefaultRouter(server, "."), http.MethodGet, testCase.Url, nil)
+	for name, tc := range testCases {
+		r, _ := http.NewRequest(http.MethodGet, tc.Url, nil)
+		w := httptest.NewRecorder()
+		tghttp.HandleNoise()(w, r, nil)
 
-		if response.Body.String() != testCase.ExpectedBody {
-			t.Errorf("%s failed. Expected body '%s', received '%s'", name, testCase.ExpectedBody, response.Body.String())
-		}
-
-		if response.Code != testCase.ExpectedCode {
-			t.Errorf("%s failed. Expected code %d, received %d", name, testCase.ExpectedCode, response.Code)
-		}
-	}
-}
-
-func TestGetNoise_Failure(t *testing.T) {
-	testCases := map[string]struct {
-		Url          string
-		ExpectedBody string
-		ExpectedCode int
-	}{
-		"fails to marshal": {
-			Url:          "/noise?from=0&to=10&resolution=2&noiseFunction=white",
-			ExpectedBody: `{"error": "Failed to generate noise: (Failed to marshal man!)"}`,
-			ExpectedCode: http.StatusInternalServerError,
-		},
-	}
-
-	for name, testCase := range testCases {
-		server := &controller.Server{
-			Marshal: func(v interface{}) ([]byte, error) {
-				return []byte{}, fmt.Errorf("Failed to marshal man!")
-			},
-		}
-		response := testutils.ExecuteTestRequest(router.CreateDefaultRouter(server, "."), http.MethodGet, testCase.Url, nil)
-
-		if response.Body.String() != testCase.ExpectedBody {
-			t.Errorf("%s failed. Expected body '%s', received '%s'", name, testCase.ExpectedBody, response.Body.String())
+		if w.Body.String() != tc.ExpectedBody {
+			t.Errorf("%s failed. Expected body '%s', received '%s'", name, tc.ExpectedBody, w.Body.String())
 		}
 
-		if response.Code != testCase.ExpectedCode {
-			t.Errorf("%s failed. Expected code %d, received %d", name, testCase.ExpectedCode, response.Code)
+		if w.Code != tc.ExpectedCode {
+			t.Errorf("%s failed. Expected code %d, received %d", name, tc.ExpectedCode, w.Code)
 		}
 	}
 }
 
-func TestGetNoise_Success(t *testing.T) {
+func TestHandleNoise_Success(t *testing.T) {
 	testCases := map[string]struct {
 		PresetName       string
 		Dimensions       []int
@@ -181,12 +148,11 @@ func TestGetNoise_Success(t *testing.T) {
 		},
 	}
 
-	for name, testCase := range testCases {
-		server := &controller.Server{
-			Marshal: json.Marshal,
-		}
+	for name, tc := range testCases {
+		w := httptest.NewRecorder()
+		handler := tghttp.HandleNoise()
 
-		for _, dimension := range testCase.Dimensions {
+		for _, dimension := range tc.Dimensions {
 			for i, params := range testCaseParams[dimension] {
 				froms := []string{}
 				for _, from := range params.From {
@@ -200,22 +166,23 @@ func TestGetNoise_Success(t *testing.T) {
 				toString := strings.Join(tos, ",")
 				resolutionString := strconv.Itoa(params.Resolution)
 
-				url := fmt.Sprintf("/noise?from=%s&to=%s&resolution=%s&noiseFunction=%s&seed=42", fromString, toString, resolutionString, testCase.PresetName)
-				noiseFunction := testCase.PresetCollection[testCase.PresetName](random.NewDefaultSource(42), []float64{1, 2, 4, 8, 16, 32, 64})
-				response := testutils.ExecuteTestRequest(router.CreateDefaultRouter(server, "."), http.MethodGet, url, nil)
+				url := fmt.Sprintf("/noise?from=%s&to=%s&resolution=%s&noiseFunction=%s&seed=42", fromString, toString, resolutionString, tc.PresetName)
+				r, _ := http.NewRequest(http.MethodGet, url, nil)
+				handler(w, r, nil)
 
-				expectedResponse := model.NewNoise(testCase.PresetName)
+				noiseFunction := tc.PresetCollection[tc.PresetName](random.NewDefaultSource(42), []float64{1, 2, 4, 8, 16, 32, 64})
+				expectedResponse := model.NewNoise(tc.PresetName)
 				expectedResponse.Generate(params.From, params.To, params.Resolution, noiseFunction)
 
 				responseObject := model.Noise{}
-				if response.Code != http.StatusOK {
-					t.Errorf("%s failed with param set %d. Expected code %d, received %d", name, i, http.StatusOK, response.Code)
-					t.Logf("Response: %s", response.Body.String())
+				if w.Code != http.StatusOK {
+					t.Errorf("%s failed with param set %d. Expected code %d, received %d", name, i, http.StatusOK, w.Code)
+					t.Logf("Response: %s", w.Body.String())
 					continue
 				}
 
-				if err := json.NewDecoder(response.Body).Decode(&responseObject); err != nil {
-					t.Errorf("%s failed with param set %d. Failed to decode response: %s", name, i, response.Body.String())
+				if err := json.NewDecoder(w.Body).Decode(&responseObject); err != nil {
+					t.Errorf("%s failed with param set %d. Failed to decode response: %s", name, i, w.Body.String())
 					continue
 				}
 

@@ -1,15 +1,12 @@
 package main
 
 import (
-	"net/http"
-
 	stdLog "log"
 
-	"encoding/json"
-	"github.com/bcokert/terragen/controller"
 	"github.com/bcokert/terragen/log"
-	"github.com/bcokert/terragen/router"
 	"os"
+	"github.com/julienschmidt/httprouter"
+	"github.com/bcokert/terragen/http"
 )
 
 func main() {
@@ -19,16 +16,26 @@ func main() {
 	}
 
 	assetsDir := os.Getenv("TERRAGEN_STATIC_ASSETS")
-	if port == "" {
+	if assetsDir == "" {
 		stdLog.Fatal("No static assets directory was provided. Please set the TERRAGEN_STATIC_ASSETS variable.")
 	}
 
-	server := controller.Server{
-		Marshal: json.Marshal,
+	bundleHash := os.Getenv("TERRAGEN_JAVASCRIPT_BUNDLE")
+	if bundleHash == "" {
+		stdLog.Fatal("No bundle file hash was specified for server. Please set the TERRAGEN_JAVASCRIPT_BUNDLE variable")
 	}
+
+	router := httprouter.New()
+
+	router.GET("/static/*path", http.HandleStatic(assetsDir))
+
+	router.GET("/", http.TimedRequest(http.HandleIndex(bundleHash), "Index"))
+
+	router.GET("/amiup", http.TimedRequest(http.HandleStatus(), "Amiup"))
+
+	router.GET("/noise", http.TimedRequest(http.HandleNoise(), "Noise"))
 
 	log.Info("Starting Terragen Service on port %s and asset directory %s", port, assetsDir)
 
-	r := router.CreateDefaultRouter(&server, assetsDir)
-	stdLog.Fatal(http.ListenAndServe(":"+port, r))
+	stdLog.Fatal(http.ListenAndServe(":"+port, router))
 }
