@@ -3,12 +3,13 @@ package generator_test
 import (
 	"testing"
 
+	"math"
+
 	"github.com/bcokert/terragen/generator"
 	"github.com/bcokert/terragen/interpolation"
 	"github.com/bcokert/terragen/noise"
 	"github.com/bcokert/terragen/random"
 	"github.com/bcokert/terragen/vector"
-	"math"
 )
 
 func TestRandom(t *testing.T) {

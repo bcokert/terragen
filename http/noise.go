@@ -7,12 +7,13 @@ import (
 
 	"errors"
 	"fmt"
+	"time"
+
 	"github.com/bcokert/terragen/log"
 	"github.com/bcokert/terragen/model"
 	"github.com/bcokert/terragen/presets"
 	"github.com/bcokert/terragen/random"
 	"github.com/julienschmidt/httprouter"
-	"time"
 )
 
 // HandleNoise generates noise with the given params. It is an idempotent call

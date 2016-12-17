@@ -3,8 +3,9 @@ package http
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/julienschmidt/httprouter"
 	"net/http"
+
+	"github.com/julienschmidt/httprouter"
 )
 
 // ListendAndServe starts the server on the specified port with the specified handler

@@ -1,11 +1,12 @@
 package generator
 
 import (
+	"math"
+
 	"github.com/bcokert/terragen/interpolation"
 	"github.com/bcokert/terragen/noise"
 	"github.com/bcokert/terragen/random"
 	"github.com/bcokert/terragen/vector"
-	"math"
 )
 
 // Random Builds a noise function that returns random floats in the range [0, 1]

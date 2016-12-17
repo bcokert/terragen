@@ -4,8 +4,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	tghttp "github.com/bcokert/terragen/http"
 	"net/http"
+
+	tghttp "github.com/bcokert/terragen/http"
 )
 
 func TestHandleStatus(t *testing.T) {

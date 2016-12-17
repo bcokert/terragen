@@ -6,13 +6,14 @@ import (
 
 	"encoding/json"
 	"fmt"
+	"net/http/httptest"
+	"strconv"
+	"strings"
+
 	tghttp "github.com/bcokert/terragen/http"
 	"github.com/bcokert/terragen/model"
 	"github.com/bcokert/terragen/presets"
 	"github.com/bcokert/terragen/random"
-	"net/http/httptest"
-	"strconv"
-	"strings"
 )
 
 func TestHandleNoise_InputValidation(t *testing.T) {

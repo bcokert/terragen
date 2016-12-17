@@ -3,10 +3,11 @@ package main
 import (
 	stdLog "log"
 
+	"os"
+
 	"github.com/bcokert/terragen/http"
 	"github.com/bcokert/terragen/log"
 	"github.com/julienschmidt/httprouter"
-	"os"
 )
 
 func main() {

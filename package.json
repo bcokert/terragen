@@ -10,7 +10,8 @@
   "config": {
     "pre-git": {
       "pre-commit": [
-        "yarn lint"
+        "yarn lint",
+        "FMT_NEEDED=$(gofmt -l .); IMP_NEEDED=$(goimports -l .); if [[ \"${FMT_NEEDED}${IMP_NEEDED}\" == '' ]]; then exit 0; else gofmt -w .; goimports -w .; echo 'The following files were modified by gofmt or goimports:'; echo \"${FMT_NEEDED}\"; echo \"${IMP_NEEDED}\"; exit 1; fi"
       ]
     }
   },

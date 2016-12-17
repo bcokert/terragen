@@ -2,8 +2,9 @@ package http
 
 import (
 	"fmt"
-	"github.com/julienschmidt/httprouter"
 	"net/http"
+
+	"github.com/julienschmidt/httprouter"
 )
 
 func HandleIndex(bundleHash string) httprouter.Handle {
