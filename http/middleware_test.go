@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/bcokert/terragen/log"
 	tghttp "github.com/bcokert/terragen/http"
+	"github.com/bcokert/terragen/log"
 	"github.com/julienschmidt/httprouter"
 )
 

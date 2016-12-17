@@ -3,10 +3,10 @@ package main
 import (
 	stdLog "log"
 
-	"github.com/bcokert/terragen/log"
-	"os"
-	"github.com/julienschmidt/httprouter"
 	"github.com/bcokert/terragen/http"
+	"github.com/bcokert/terragen/log"
+	"github.com/julienschmidt/httprouter"
+	"os"
 )
 
 func main() {

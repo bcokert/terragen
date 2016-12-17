@@ -1,10 +1,10 @@
 package http
 
 import (
-	"github.com/julienschmidt/httprouter"
 	"github.com/bcokert/terragen/timing"
-	"time"
+	"github.com/julienschmidt/httprouter"
 	"net/http"
+	"time"
 )
 
 func TimedRequest(handlerFunc httprouter.Handle, name string) httprouter.Handle {

@@ -1,10 +1,10 @@
 package http
 
 import (
+	"encoding/json"
+	"fmt"
 	"github.com/julienschmidt/httprouter"
 	"net/http"
-	"fmt"
-	"encoding/json"
 )
 
 // ListendAndServe starts the server on the specified port with the specified handler
@@ -51,7 +51,7 @@ func marshalOutput(response interface{}, code int) (string, int) {
 		return fmt.Sprintf(`{"error": "%s"}`, err.Error()), code
 	}
 
-	bytes, err := json.Marshal(response);
+	bytes, err := json.Marshal(response)
 	if err != nil {
 		return fmt.Sprintf(`{"error": "An error occurred while marshaling a response: %s"}`, err.Error()), http.StatusInternalServerError
 	}

@@ -5,14 +5,14 @@ import (
 	"net/url"
 	"strconv"
 
-	errs "errors"
+	"errors"
+	"fmt"
 	"github.com/bcokert/terragen/log"
 	"github.com/bcokert/terragen/model"
 	"github.com/bcokert/terragen/presets"
 	"github.com/bcokert/terragen/random"
 	"github.com/julienschmidt/httprouter"
 	"time"
-	"fmt"
 )
 
 // HandleNoise generates noise with the given params. It is an idempotent call
@@ -53,55 +53,55 @@ func validateNoiseParams(params url.Values) (response queryParams, err error) {
 
 	// Check for missing params
 	if from == "" {
-		return queryParams{}, errs.New("From must be an array of integers")
+		return queryParams{}, errors.New("From must be an array of integers")
 	}
 
 	if to == "" {
-		return queryParams{}, errs.New("To must be an array of integers")
+		return queryParams{}, errors.New("To must be an array of integers")
 	}
 
 	if resolution == "" {
-		return queryParams{}, errs.New("Resolution must be a positive integer")
+		return queryParams{}, errors.New("Resolution must be a positive integer")
 	}
 
 	if noiseFunction == "" {
-		return queryParams{}, errs.New("NoiseFunction must be a valid preset")
+		return queryParams{}, errors.New("NoiseFunction must be a valid preset")
 	}
 
 	// Validate from and to values
 	response.from = parseIntArray(from)
 	if len(response.from) == 0 {
-		return queryParams{}, errs.New("From must be an array of integers")
+		return queryParams{}, errors.New("From must be an array of integers")
 	}
 
 	response.to = parseIntArray(to)
 	if len(response.to) == 0 {
-		return queryParams{}, errs.New("To must be an array of integers")
+		return queryParams{}, errors.New("To must be an array of integers")
 	}
 
 	if len(response.to) != len(response.from) {
-		return queryParams{}, errs.New("From and To must be the same length")
+		return queryParams{}, errors.New("From and To must be the same length")
 	}
 
 	for i := range response.from {
 		if response.from[i] >= response.to[i] {
-			return queryParams{}, errs.New("The value of To must be greater than the value of From in each dimension")
+			return queryParams{}, errors.New("The value of To must be greater than the value of From in each dimension")
 		}
 	}
 
 	// Validate resolution value
 	if response.resolution, err = strconv.Atoi(resolution); err != nil {
-		return queryParams{}, errs.New("Resolution must be a positive integer")
+		return queryParams{}, errors.New("Resolution must be a positive integer")
 	}
 	if response.resolution < 1 {
-		return queryParams{}, errs.New("Resolution must be a positive integer")
+		return queryParams{}, errors.New("Resolution must be a positive integer")
 	}
 
 	// Validate noise params value
 	response.presetName = noiseFunction
 	response.preset = searchPresets(noiseFunction)
 	if response.preset == nil {
-		return queryParams{}, errs.New("NoiseFunction must be a valid preset")
+		return queryParams{}, errors.New("NoiseFunction must be a valid preset")
 	}
 
 	// Validate seed, or generate if missing
@@ -109,7 +109,7 @@ func validateNoiseParams(params url.Values) (response queryParams, err error) {
 		response.seed = time.Now().Unix()
 	} else {
 		if response.seed, err = strconv.ParseInt(seed, 10, 0); err != nil {
-			return queryParams{}, errs.New("Seed must be a positive integer")
+			return queryParams{}, errors.New("Seed must be a positive integer")
 		}
 	}
 

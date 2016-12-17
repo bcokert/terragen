@@ -4,15 +4,15 @@ import (
 	"net/http"
 	"testing"
 
-	tghttp "github.com/bcokert/terragen/http"
-	"net/http/httptest"
-	"fmt"
-	"strings"
-	"github.com/bcokert/terragen/random"
 	"encoding/json"
-	"github.com/bcokert/terragen/presets"
-	"strconv"
+	"fmt"
+	tghttp "github.com/bcokert/terragen/http"
 	"github.com/bcokert/terragen/model"
+	"github.com/bcokert/terragen/presets"
+	"github.com/bcokert/terragen/random"
+	"net/http/httptest"
+	"strconv"
+	"strings"
 )
 
 func TestHandleNoise_InputValidation(t *testing.T) {
