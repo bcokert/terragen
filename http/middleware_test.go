@@ -36,12 +36,10 @@ func TestTimedRequest(t *testing.T) {
 
 	for name, testCase := range testCases {
 		log.FlushTestLogger()
-		request, _ := http.NewRequest(http.MethodGet, "/", nil)
-		recorder := httptest.NewRecorder()
+		r, _ := http.NewRequest(http.MethodGet, "/", nil)
+		w := httptest.NewRecorder()
 
-		router := httprouter.New()
-		router.GET("/", tghttp.TimedRequest(testCase.Handler, "MyHandler"))
-		router.ServeHTTP(recorder, request)
+		tghttp.TimedRequest(testCase.Handler, "MyHandler")(w, r, nil)
 
 		output := log.FlushTestLogger()
 		if matches, err := regexp.Match(testCase.ExpectedLogRegex, []byte(output)); !matches || err != nil {
