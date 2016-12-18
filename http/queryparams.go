@@ -5,9 +5,9 @@ import (
 	"strings"
 )
 
-// parseIntArrayParam tries to parse the given query param into an array of integers
+// ParseIntArrayParam tries to parse the given query param into an array of integers
 // If it can't, it always returns an empty list
-func parseIntArray(v string) []int {
+func ParseIntArray(v string) []int {
 	ints := make([]int, 0, 3)
 
 	if v == "" {

@@ -16,105 +16,202 @@ import (
 	"github.com/bcokert/terragen/random"
 )
 
-func TestHandleNoise_InputValidation(t *testing.T) {
+func TestHandleNoise(t *testing.T) {
 	testCases := map[string]struct {
-		Url          string
-		ExpectedBody string
-		ExpectedCode int
+		From                     string
+		To                       string
+		Resolution               string
+		Preset                   string
+		Seed                     string
+		ExpectedPresetCollection map[string]presets.Preset // TODO: remove when noise composition refactor is done
+		ExpectedStatusCode       int
+		ExpectedErrorBody        string
 	}{
-		"missing from": {
-			Url:          "/noise?to=12&resolution=14&noiseFunction=white",
-			ExpectedBody: `{"error": "Invalid param: (From must be an array of integers)"}`,
-			ExpectedCode: http.StatusBadRequest,
+		"Default from": {
+			From: "", To: "3,2", Resolution: "5", Preset: "red", Seed: "922",
+			ExpectedPresetCollection: presets.SpectralPresets,
+			ExpectedStatusCode:       http.StatusOK,
+			ExpectedErrorBody:        "",
 		},
-		"illegal from": {
-			Url:          "/noise?from=52,banana&to=12&resolution=14&noiseFunction=white",
-			ExpectedBody: `{"error": "Invalid param: (From must be an array of integers)"}`,
-			ExpectedCode: http.StatusBadRequest,
+		"Default to": {
+			From: "1,2", To: "", Resolution: "3", Preset: "blue", Seed: "123",
+			ExpectedPresetCollection: presets.SpectralPresets,
+			ExpectedStatusCode:       http.StatusOK,
+			ExpectedErrorBody:        "",
 		},
-		"float from": {
-			Url:          "/noise?from=52.32&to=12&resolution=14&noiseFunction=white",
-			ExpectedBody: `{"error": "Invalid param: (From must be an array of integers)"}`,
-			ExpectedCode: http.StatusBadRequest,
+		"Default resolution": {
+			From: "1", To: "10", Resolution: "", Preset: "white", Seed: "34",
+			ExpectedPresetCollection: presets.SpectralPresets,
+			ExpectedStatusCode:       http.StatusOK,
+			ExpectedErrorBody:        "",
 		},
-		"missing to": {
-			Url:          "/noise?from=14&resolution=14&noiseFunction=white",
-			ExpectedBody: `{"error": "Invalid param: (To must be an array of integers)"}`,
-			ExpectedCode: http.StatusBadRequest,
+		"Default preset": {
+			From: "1", To: "3", Resolution: "20", Preset: "", Seed: "9999",
+			ExpectedPresetCollection: presets.SpectralPresets,
+			ExpectedStatusCode:       http.StatusOK,
+			ExpectedErrorBody:        "",
+		},
+		"All Defaults except seed": {
+			From: "", To: "", Resolution: "", Preset: "", Seed: "64326",
+			ExpectedPresetCollection: presets.SpectralPresets,
+			ExpectedStatusCode:       http.StatusOK,
+			ExpectedErrorBody:        "",
+		},
+		"All set": {
+			From: "0,2", To: "4,5", Resolution: "12", Preset: "rawPerlin", Seed: "62346236236",
+			ExpectedPresetCollection: presets.LatticePresets,
+			ExpectedStatusCode:       http.StatusOK,
+			ExpectedErrorBody:        "",
+		},
+		"Illegal from": {
+			From: "52,banana", To: "12", Resolution: "14", Preset: "white", Seed: "162",
+			ExpectedPresetCollection: presets.SpectralPresets,
+			ExpectedStatusCode:       http.StatusBadRequest,
+			ExpectedErrorBody:        `{"error": "Invalid param: (From must be an array of integers)"}`,
+		},
+		"Float from": {
+			From: "52.32", To: "12", Resolution: "14", Preset: "white", Seed: "162",
+			ExpectedPresetCollection: presets.SpectralPresets,
+			ExpectedStatusCode:       http.StatusBadRequest,
+			ExpectedErrorBody:        `{"error": "Invalid param: (From must be an array of integers)"}`,
 		},
 		"illegal to": {
-			Url:          "/noise?from=15&to=52,banana&resolution=14&noiseFunction=white",
-			ExpectedBody: `{"error": "Invalid param: (To must be an array of integers)"}`,
-			ExpectedCode: http.StatusBadRequest,
+			From: "15", To: "52,banana", Resolution: "14", Preset: "white", Seed: "56",
+			ExpectedPresetCollection: presets.SpectralPresets,
+			ExpectedStatusCode:       http.StatusBadRequest,
+			ExpectedErrorBody:        `{"error": "Invalid param: (To must be an array of integers)"}`,
 		},
 		"float to": {
-			Url:          "/noise?from=15&to=52.55&resolution=14&noiseFunction=white",
-			ExpectedBody: `{"error": "Invalid param: (To must be an array of integers)"}`,
-			ExpectedCode: http.StatusBadRequest,
+			From: "15", To: "52.6", Resolution: "14", Preset: "white", Seed: "56",
+			ExpectedPresetCollection: presets.SpectralPresets,
+			ExpectedStatusCode:       http.StatusBadRequest,
+			ExpectedErrorBody:        `{"error": "Invalid param: (To must be an array of integers)"}`,
 		},
 		"from and to diff lengths": {
-			Url:          "/noise?from=15&to=52,77&resolution=14&noiseFunction=white",
-			ExpectedBody: `{"error": "Invalid param: (From and To must be the same length)"}`,
-			ExpectedCode: http.StatusBadRequest,
+			From: "15", To: "52,77", Resolution: "14", Preset: "white", Seed: "56",
+			ExpectedPresetCollection: presets.SpectralPresets,
+			ExpectedStatusCode:       http.StatusBadRequest,
+			ExpectedErrorBody:        `{"error": "Invalid param: (From and To must be the same length)"}`,
 		},
 		"from greater than to": {
-			Url:          "/noise?from=15&to=10&resolution=14&noiseFunction=white",
-			ExpectedBody: `{"error": "Invalid param: (The value of To must be greater than the value of From in each dimension)"}`,
-			ExpectedCode: http.StatusBadRequest,
+			From: "15", To: "7", Resolution: "14", Preset: "white", Seed: "56",
+			ExpectedPresetCollection: presets.SpectralPresets,
+			ExpectedStatusCode:       http.StatusBadRequest,
+			ExpectedErrorBody:        `{"error": "Invalid param: (The value of To must be greater than the value of From in each dimension)"}`,
 		},
 		"from equals to": {
-			Url:          "/noise?from=15&to=15&resolution=14&noiseFunction=white",
-			ExpectedBody: `{"error": "Invalid param: (The value of To must be greater than the value of From in each dimension)"}`,
-			ExpectedCode: http.StatusBadRequest,
-		},
-		"missing resolution": {
-			Url:          "/noise?from=14&to=16&noiseFunction=white",
-			ExpectedBody: `{"error": "Invalid param: (Resolution must be a positive integer)"}`,
-			ExpectedCode: http.StatusBadRequest,
+			From: "7", To: "7", Resolution: "14", Preset: "white", Seed: "56",
+			ExpectedPresetCollection: presets.SpectralPresets,
+			ExpectedStatusCode:       http.StatusBadRequest,
+			ExpectedErrorBody:        `{"error": "Invalid param: (The value of To must be greater than the value of From in each dimension)"}`,
 		},
 		"illegal resolution": {
-			Url:          "/noise?from=15&to=52&resolution=51x23&noiseFunction=white",
-			ExpectedBody: `{"error": "Invalid param: (Resolution must be a positive integer)"}`,
-			ExpectedCode: http.StatusBadRequest,
+			From: "7", To: "11", Resolution: "14x15", Preset: "white", Seed: "56",
+			ExpectedPresetCollection: presets.SpectralPresets,
+			ExpectedStatusCode:       http.StatusBadRequest,
+			ExpectedErrorBody:        `{"error": "Invalid param: (Resolution must be a positive integer)"}`,
 		},
 		"resolution too small": {
-			Url:          "/noise?from=15&to=52&resolution=0&noiseFunction=white",
-			ExpectedBody: `{"error": "Invalid param: (Resolution must be a positive integer)"}`,
-			ExpectedCode: http.StatusBadRequest,
-		},
-		"missing noiseFunction": {
-			Url:          "/noise?from=14&to=15&resolution=42",
-			ExpectedBody: `{"error": "Invalid param: (NoiseFunction must be a valid preset)"}`,
-			ExpectedCode: http.StatusBadRequest,
+			From: "7", To: "11", Resolution: "0", Preset: "white", Seed: "56",
+			ExpectedPresetCollection: presets.SpectralPresets,
+			ExpectedStatusCode:       http.StatusBadRequest,
+			ExpectedErrorBody:        `{"error": "Invalid param: (Resolution must be a positive integer)"}`,
 		},
 		"invalid noise function": {
-			Url:          "/noise?from=15&to=52&resolution=51&noiseFunction=ae1234",
-			ExpectedBody: `{"error": "Invalid param: (NoiseFunction must be a valid preset)"}`,
-			ExpectedCode: http.StatusBadRequest,
+			From: "7", To: "11", Resolution: "5", Preset: "ae1234", Seed: "56",
+			ExpectedPresetCollection: presets.SpectralPresets,
+			ExpectedStatusCode:       http.StatusBadRequest,
+			ExpectedErrorBody:        `{"error": "Invalid param: (NoiseFunction must be a valid preset)"}`,
 		},
 		"invalid seed": {
-			Url:          "/noise?from=15&to=52&resolution=51&noiseFunction=white&seed=banana",
-			ExpectedBody: `{"error": "Invalid param: (Seed must be a positive integer)"}`,
-			ExpectedCode: http.StatusBadRequest,
+			From: "7", To: "11", Resolution: "5", Preset: "white", Seed: "banana",
+			ExpectedPresetCollection: presets.SpectralPresets,
+			ExpectedStatusCode:       http.StatusBadRequest,
+			ExpectedErrorBody:        `{"error": "Invalid param: (Seed must be a positive integer)"}`,
 		},
 	}
 
 	for name, tc := range testCases {
-		r, _ := http.NewRequest(http.MethodGet, tc.Url, nil)
+		url := fmt.Sprintf("/noise?from=%s&to=%s&resolution=%s&noiseFunction=%s&seed=%s", tc.From, tc.To, tc.Resolution, tc.Preset, tc.Seed)
+
 		w := httptest.NewRecorder()
+		r, _ := http.NewRequest(http.MethodGet, url, nil)
 		tghttp.HandleNoise()(w, r, nil)
 
-		if w.Body.String() != tc.ExpectedBody {
-			t.Errorf("%s failed. Expected body '%s', received '%s'", name, tc.ExpectedBody, w.Body.String())
+		if w.Code != tc.ExpectedStatusCode {
+			t.Errorf("%s failed. Expected status code %d, received %d", name, tc.ExpectedStatusCode, w.Code)
+
+			// If we got an error when we should have got a success, print the error message as well so we can debug faster
+			if tc.ExpectedStatusCode == http.StatusOK {
+				t.Logf("Response: %s", w.Body.String())
+			}
+
+			continue
 		}
 
-		if w.Code != tc.ExpectedCode {
-			t.Errorf("%s failed. Expected code %d, received %d", name, tc.ExpectedCode, w.Code)
+		// Handle expected errors
+		if tc.ExpectedErrorBody != "" {
+			if w.Body.String() != tc.ExpectedErrorBody {
+				t.Errorf("'%s' failed. Expected error response '%s', received '%s'", name, tc.ExpectedErrorBody, w.Body.String())
+			}
+			continue
+		}
+
+		// Handle expected successes
+		from := []int{0, 0}
+		to := []int{5, 5}
+		resolution := 20
+		var seed int64
+		presetName := "red"
+		var preset presets.Preset
+		var err error
+		var ok bool
+
+		if tc.From != "" {
+			from = tghttp.ParseIntArray(tc.From)
+		}
+		if tc.To != "" {
+			to = tghttp.ParseIntArray(tc.To)
+		}
+		if tc.Resolution != "" {
+			if resolution, err = strconv.Atoi(tc.Resolution); err != nil {
+				t.Errorf("'%s' failed. Expected a success but passed in an invalid resolution: %s", name, tc.Resolution)
+				continue
+			}
+		}
+		if tc.Seed == "" {
+			t.Errorf("'%s' failed. Cannot test for success with a random seed (must specify)", name)
+			continue
+		}
+		if seed, err = strconv.ParseInt(tc.Seed, 10, 0); err != nil {
+			t.Errorf("'%s' failed. Expected a success but passed in an invalid seed: %s", name, tc.Seed)
+			continue
+		}
+		if tc.Preset != "" {
+			presetName = tc.Preset
+		}
+		if preset, ok = tc.ExpectedPresetCollection[presetName]; !ok {
+			t.Errorf("'%s' failed. Expected a success but passed in an invalid preset: %s", name, presetName)
+			continue
+		}
+
+		noiseFunction := preset(random.NewDefaultSource(seed), []float64{1, 2, 4, 8, 16, 32, 64})
+		expectedResponse := model.NewNoise(presetName)
+		expectedResponse.Generate(from, to, resolution, noiseFunction)
+
+		responseObject := model.Noise{}
+		if err := json.NewDecoder(w.Body).Decode(&responseObject); err != nil {
+			t.Errorf("'%s' failed. Failed to decode response: %s", name, w.Body.String())
+			continue
+		}
+
+		if !responseObject.IsEqual(expectedResponse) {
+			t.Errorf("'%s' failed. Expected response '%#v', received '%#v'", name, expectedResponse, responseObject)
 		}
 	}
 }
 
-func TestHandleNoise_Success(t *testing.T) {
+func TestHandleNoise_Permutations(t *testing.T) {
 	testCases := map[string]struct {
 		PresetName       string
 		Dimensions       []int
@@ -188,7 +285,13 @@ func TestHandleNoise_Success(t *testing.T) {
 				}
 
 				if !responseObject.IsEqual(expectedResponse) {
-					t.Errorf("%s failed with param set %d. Expected response '%#v', received '%#v'", name, i, expectedResponse, responseObject)
+					if len(responseObject.Values) > 5 {
+						responseObject.Values = responseObject.Values[:5]
+					}
+					if len(expectedResponse.Values) > 5 {
+						expectedResponse.Values = expectedResponse.Values[:5]
+					}
+					t.Errorf("%s failed with param set %d. Expected response (values trimmed to length 5) '%+v', received '%+v'", name, i, expectedResponse, responseObject)
 				}
 			}
 		}

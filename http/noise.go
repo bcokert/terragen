@@ -28,6 +28,7 @@ func HandleNoise() httprouter.Handle {
 		}
 
 		// Generate noise from the given params and preset
+		log.Info("Generating noise with the following params: %+v", params)
 		noise := model.NewNoise(params.presetName)
 		noiseFn := params.preset(random.NewDefaultSource(params.seed), []float64{1, 2, 4, 8, 16, 32, 64})
 		noise.Generate(params.from, params.to, params.resolution, noiseFn)
@@ -52,32 +53,21 @@ func validateNoiseParams(params url.Values) (response queryParams, err error) {
 	noiseFunction := params.Get("noiseFunction")
 	seed := params.Get("seed")
 
-	// Check for missing params
-	if from == "" {
-		return queryParams{}, errors.New("From must be an array of integers")
-	}
-
-	if to == "" {
-		return queryParams{}, errors.New("To must be an array of integers")
-	}
-
-	if resolution == "" {
-		return queryParams{}, errors.New("Resolution must be a positive integer")
-	}
-
-	if noiseFunction == "" {
-		return queryParams{}, errors.New("NoiseFunction must be a valid preset")
-	}
-
 	// Validate from and to values
-	response.from = parseIntArray(from)
-	if len(response.from) == 0 {
-		return queryParams{}, errors.New("From must be an array of integers")
+	response.from = []int{0, 0}
+	if from != "" {
+		response.from = ParseIntArray(from)
+		if len(response.from) == 0 {
+			return queryParams{}, errors.New("From must be an array of integers")
+		}
 	}
 
-	response.to = parseIntArray(to)
-	if len(response.to) == 0 {
-		return queryParams{}, errors.New("To must be an array of integers")
+	response.to = []int{5, 5}
+	if to != "" {
+		response.to = ParseIntArray(to)
+		if len(response.to) == 0 {
+			return queryParams{}, errors.New("To must be an array of integers")
+		}
 	}
 
 	if len(response.to) != len(response.from) {
@@ -91,24 +81,29 @@ func validateNoiseParams(params url.Values) (response queryParams, err error) {
 	}
 
 	// Validate resolution value
-	if response.resolution, err = strconv.Atoi(resolution); err != nil {
-		return queryParams{}, errors.New("Resolution must be a positive integer")
-	}
-	if response.resolution < 1 {
-		return queryParams{}, errors.New("Resolution must be a positive integer")
+	response.resolution = 20
+	if resolution != "" {
+		if response.resolution, err = strconv.Atoi(resolution); err != nil {
+			return queryParams{}, errors.New("Resolution must be a positive integer")
+		}
+		if response.resolution < 1 {
+			return queryParams{}, errors.New("Resolution must be a positive integer")
+		}
 	}
 
 	// Validate noise params value
-	response.presetName = noiseFunction
-	response.preset = searchPresets(noiseFunction)
+	response.presetName = "red"
+	if noiseFunction != "" {
+		response.presetName = noiseFunction
+	}
+	response.preset = searchPresets(response.presetName)
 	if response.preset == nil {
 		return queryParams{}, errors.New("NoiseFunction must be a valid preset")
 	}
 
 	// Validate seed, or generate if missing
-	if seed == "" {
-		response.seed = time.Now().Unix()
-	} else {
+	response.seed = time.Now().Unix()
+	if seed != "" {
 		if response.seed, err = strconv.ParseInt(seed, 10, 0); err != nil {
 			return queryParams{}, errors.New("Seed must be a positive integer")
 		}
