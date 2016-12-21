@@ -1,20 +1,20 @@
-package random_test
+package math_test
 
 import (
 	"math/rand"
 	"testing"
 
-	"github.com/bcokert/terragen/random"
+	tgmath "github.com/bcokert/terragen/math"
 	"github.com/bcokert/terragen/testutils"
 )
 
 func TestNewDefaultSource(t *testing.T) {
 	testCases := map[string]struct {
-		Source   random.Source
-		Expected random.Source
+		Source   tgmath.Source
+		Expected tgmath.Source
 	}{
 		"Equal Seed": {
-			Source:   random.NewDefaultSource(44),
+			Source:   tgmath.NewDefaultSource(44),
 			Expected: rand.New(rand.NewSource(44)),
 		},
 	}
@@ -30,15 +30,15 @@ func TestNewDefaultSource(t *testing.T) {
 
 func TestConstantSourceMock_Float64(t *testing.T) {
 	testCases := map[string]struct {
-		Mock            *random.ConstantSourceMock
+		Mock            *tgmath.ConstantSourceMock
 		ExpectedResults []float64
 	}{
 		"zero": {
-			Mock:            &random.ConstantSourceMock{ConstantResult: 0},
+			Mock:            &tgmath.ConstantSourceMock{ConstantResult: 0},
 			ExpectedResults: []float64{0, 0, 0, 0, 0},
 		},
 		"random": {
-			Mock:            &random.ConstantSourceMock{ConstantResult: 17.34},
+			Mock:            &tgmath.ConstantSourceMock{ConstantResult: 17.34},
 			ExpectedResults: []float64{17.34, 17.34, 17.34},
 		},
 	}
@@ -54,19 +54,19 @@ func TestConstantSourceMock_Float64(t *testing.T) {
 
 func TestIncrementingSourceMock_Float64(t *testing.T) {
 	testCases := map[string]struct {
-		Mock            *random.IncrementingSourceMock
+		Mock            *tgmath.IncrementingSourceMock
 		ExpectedResults []float64
 	}{
 		"zero": {
-			Mock:            &random.IncrementingSourceMock{IncrementingResult: 0},
+			Mock:            &tgmath.IncrementingSourceMock{IncrementingResult: 0},
 			ExpectedResults: []float64{1, 2, 3, 4, 5},
 		},
 		"negative": {
-			Mock:            &random.IncrementingSourceMock{IncrementingResult: -5},
+			Mock:            &tgmath.IncrementingSourceMock{IncrementingResult: -5},
 			ExpectedResults: []float64{-4, -3, -2, -1, 0},
 		},
 		"random": {
-			Mock:            &random.IncrementingSourceMock{IncrementingResult: 16.34},
+			Mock:            &tgmath.IncrementingSourceMock{IncrementingResult: 16.34},
 			ExpectedResults: []float64{17.34, 18.34, 19.34},
 		},
 	}

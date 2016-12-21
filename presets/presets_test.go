@@ -5,13 +5,11 @@ import (
 	"testing"
 
 	"github.com/bcokert/terragen/generator"
-	"github.com/bcokert/terragen/interpolation"
+	tgmath "github.com/bcokert/terragen/math"
 	"github.com/bcokert/terragen/noise"
 	"github.com/bcokert/terragen/presets"
-	"github.com/bcokert/terragen/random"
 	"github.com/bcokert/terragen/synthesizer"
 	"github.com/bcokert/terragen/transformer"
-	"github.com/bcokert/terragen/vector"
 )
 
 func testSpectralPreset(t *testing.T, preset presets.Preset, weightExponent float64) {
@@ -30,7 +28,7 @@ func testSpectralPreset(t *testing.T, preset presets.Preset, weightExponent floa
 	}
 
 	for name, testCase := range testCases {
-		expectedGeneratorFn := generator.Random(random.NewDefaultSource(42))
+		expectedGeneratorFn := generator.Random(tgmath.NewDefaultSource(42))
 		expectedNoiseFnGenerator := func(freq float64) noise.Function {
 			return transformer.Sinusoid(expectedGeneratorFn, freq)
 		}
@@ -39,7 +37,7 @@ func testSpectralPreset(t *testing.T, preset presets.Preset, weightExponent floa
 		}
 		expectedSynthesizerFn := synthesizer.Octave(expectedNoiseFnGenerator, expectedWeightFn, testCase.Frequencies)
 
-		noiseFunction := preset(random.NewDefaultSource(42), testCase.Frequencies)
+		noiseFunction := preset(tgmath.NewDefaultSource(42), testCase.Frequencies)
 
 		for _, dimension := range testCase.Dimensions {
 			if !noiseFunction.IsEqual(expectedSynthesizerFn, dimension) {
@@ -79,11 +77,11 @@ func TestRawPerlin(t *testing.T) {
 	}
 
 	for name, testCase := range testCases {
-		expectedCache := vector.NewDefaultRandomGridCache(random.NewDefaultSource(42))
-		expectedInterpolator := interpolation.NewInterpolator(interpolation.DampCubicEase)
+		expectedCache := tgmath.NewDefaultRandomGridCache(tgmath.NewDefaultSource(42))
+		expectedInterpolator := tgmath.NewInterpolator(tgmath.DampCubicEase)
 		expectedGeneratorFn := generator.Perlin(expectedCache, expectedInterpolator)
 
-		noiseFunction := presets.RawPerlin(random.NewDefaultSource(42), testCase.Frequencies)
+		noiseFunction := presets.RawPerlin(tgmath.NewDefaultSource(42), testCase.Frequencies)
 
 		if !noiseFunction.IsEqual(expectedGeneratorFn, 2) {
 			t.Errorf("%s failed in dimension %d. Noise function did not equal expected function", name, 2)

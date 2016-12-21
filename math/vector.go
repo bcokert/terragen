@@ -1,23 +1,15 @@
-package vector
+package math
 
 import (
 	"fmt"
 	"math"
-
-	"github.com/bcokert/terragen/random"
 )
 
 // Vec2 Represents a 2d vector with simple operations
 type Vec2 [2]float64
 
-// NewVec2 creates a new Vec2 with the given components
-func NewVec2(x, y float64) Vec2 {
-	vec := Vec2{0: x, 1: y}
-	return vec
-}
-
 // RandomDirectionVec2 Creates a random normalized Vec2 with dimensions in the range [-1,1]
-func RandomDirectionVec2(random random.Source) Vec2 {
+func RandomDirectionVec2(random Source) Vec2 {
 	a, b := (random.Float64()*2)-1, (random.Float64()*2)-1
 
 	// Ensure the vector can be normalized

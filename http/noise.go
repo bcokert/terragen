@@ -10,9 +10,9 @@ import (
 	"time"
 
 	"github.com/bcokert/terragen/log"
+	"github.com/bcokert/terragen/math"
 	"github.com/bcokert/terragen/model"
 	"github.com/bcokert/terragen/presets"
-	"github.com/bcokert/terragen/random"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -30,7 +30,7 @@ func HandleNoise() httprouter.Handle {
 		// Generate noise from the given params and preset
 		log.Info("Generating noise with the following params: %+v", params)
 		noise := model.NewNoise(params.presetName)
-		noiseFn := params.preset(random.NewDefaultSource(params.seed), []float64{1, 2, 4, 8, 16, 32, 64})
+		noiseFn := params.preset(math.NewDefaultSource(params.seed), []float64{1, 2, 4, 8, 16, 32, 64})
 		noise.Generate(params.from, params.to, params.resolution, noiseFn)
 
 		return noise, http.StatusOK

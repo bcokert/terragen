@@ -4,16 +4,14 @@ import (
 	"math"
 
 	"github.com/bcokert/terragen/generator"
-	"github.com/bcokert/terragen/interpolation"
+	tgmath "github.com/bcokert/terragen/math"
 	"github.com/bcokert/terragen/noise"
-	"github.com/bcokert/terragen/random"
 	"github.com/bcokert/terragen/synthesizer"
 	"github.com/bcokert/terragen/transformer"
-	"github.com/bcokert/terragen/vector"
 )
 
 // A Preset is a function that takes a seed and frequencies and produces a pre-constructed noise function
-type Preset func(source random.Source, frequencies []float64) noise.Function
+type Preset func(source tgmath.Source, frequencies []float64) noise.Function
 
 // SpectralPresets is a map from preset names to Spectral Presets
 // A Spectral Preset creates octave noise functions with randomly phased sinusoidal noise functions.
@@ -28,31 +26,31 @@ var SpectralPresets = map[string]Preset{
 }
 
 // Violet is a Preset with heavy emphasis on high frequencies
-func Violet(source random.Source, frequencies []float64) noise.Function {
+func Violet(source tgmath.Source, frequencies []float64) noise.Function {
 	return spectral(source, frequencies, 2)
 }
 
 // Blue is a Preset with light emphasis on high frequencies
-func Blue(source random.Source, frequencies []float64) noise.Function {
+func Blue(source tgmath.Source, frequencies []float64) noise.Function {
 	return spectral(source, frequencies, 1)
 }
 
 // White is a Preset with equal emphasis on all frequencies
-func White(source random.Source, frequencies []float64) noise.Function {
+func White(source tgmath.Source, frequencies []float64) noise.Function {
 	return spectral(source, frequencies, 0)
 }
 
 // Pink is a Preset with light emphasis on low frequencies
-func Pink(source random.Source, frequencies []float64) noise.Function {
+func Pink(source tgmath.Source, frequencies []float64) noise.Function {
 	return spectral(source, frequencies, -1)
 }
 
 // Red is a Preset with heavy emphasis on low frequencies
-func Red(source random.Source, frequencies []float64) noise.Function {
+func Red(source tgmath.Source, frequencies []float64) noise.Function {
 	return spectral(source, frequencies, -2)
 }
 
-func spectral(source random.Source, frequencies []float64, weightExponent float64) noise.Function {
+func spectral(source tgmath.Source, frequencies []float64, weightExponent float64) noise.Function {
 	phaseFn := generator.Random(source)
 
 	weightFn := func(frequency float64) float64 {
@@ -74,8 +72,8 @@ var LatticePresets = map[string]Preset{
 }
 
 // RawPerlin is a lattice preset that returns the output of a perlin generator, without modifying it
-func RawPerlin(source random.Source, frequencies []float64) noise.Function {
-	cache := vector.NewDefaultRandomGridCache(source)
-	interpolator := interpolation.NewInterpolator(interpolation.DampCubicEase)
+func RawPerlin(source tgmath.Source, frequencies []float64) noise.Function {
+	cache := tgmath.NewDefaultRandomGridCache(source)
+	interpolator := tgmath.NewInterpolator(tgmath.DampCubicEase)
 	return generator.Perlin(cache, interpolator)
 }

@@ -3,14 +3,12 @@ package generator
 import (
 	"math"
 
-	"github.com/bcokert/terragen/interpolation"
+	tgmath "github.com/bcokert/terragen/math"
 	"github.com/bcokert/terragen/noise"
-	"github.com/bcokert/terragen/random"
-	"github.com/bcokert/terragen/vector"
 )
 
 // Random Builds a noise function that returns random floats in the range [0, 1]
-func Random(random random.Source) noise.Function {
+func Random(random tgmath.Source) noise.Function {
 	return func(t []float64) float64 {
 		return random.Float64()
 	}
@@ -18,7 +16,7 @@ func Random(random random.Source) noise.Function {
 
 // Perlin builds a noise function that returns Lattice Gradient noise values as described by Ken Perlin
 // TODO: Handle other dimensions than 2
-func Perlin(cache vector.GridCache, interpolator interpolation.Interpolator) noise.Function {
+func Perlin(cache tgmath.GridCache, interpolator tgmath.Interpolator) noise.Function {
 	return func(t []float64) float64 {
 		//log.Debug("Calculating perlin noise at %v %v", t[0], t[1])
 
@@ -36,7 +34,7 @@ func Perlin(cache vector.GridCache, interpolator interpolation.Interpolator) noi
 		// Generate influences by computing the dot product of a random vector and a direction vector for each grid point
 		influences := [4]float64{}
 		for i, gridPoint := range gridPoints {
-			directionVector := vector.NewVec2(t[0]-float64(gridPoint[0]), t[1]-float64(gridPoint[1]))
+			directionVector := tgmath.Vec2{t[0] - float64(gridPoint[0]), t[1] - float64(gridPoint[1])}
 			gridVector := cache.Get(gridPoint[0], gridPoint[1])
 			influences[i] = gridVector.Dot(directionVector)
 

@@ -1,4 +1,4 @@
-package random
+package math
 
 // IncrementingSourceMock is a mock Source who's Float64 method turns an incrementing value on each call, which can be reset
 type IncrementingSourceMock struct {

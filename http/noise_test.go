@@ -11,9 +11,9 @@ import (
 	"strings"
 
 	tghttp "github.com/bcokert/terragen/http"
+	"github.com/bcokert/terragen/math"
 	"github.com/bcokert/terragen/model"
 	"github.com/bcokert/terragen/presets"
-	"github.com/bcokert/terragen/random"
 )
 
 func TestHandleNoise(t *testing.T) {
@@ -195,7 +195,7 @@ func TestHandleNoise(t *testing.T) {
 			continue
 		}
 
-		noiseFunction := preset(random.NewDefaultSource(seed), []float64{1, 2, 4, 8, 16, 32, 64})
+		noiseFunction := preset(math.NewDefaultSource(seed), []float64{1, 2, 4, 8, 16, 32, 64})
 		expectedResponse := model.NewNoise(presetName)
 		expectedResponse.Generate(from, to, resolution, noiseFunction)
 
@@ -268,7 +268,7 @@ func TestHandleNoise_Permutations(t *testing.T) {
 				r, _ := http.NewRequest(http.MethodGet, url, nil)
 				handler(w, r, nil)
 
-				noiseFunction := tc.PresetCollection[tc.PresetName](random.NewDefaultSource(42), []float64{1, 2, 4, 8, 16, 32, 64})
+				noiseFunction := tc.PresetCollection[tc.PresetName](math.NewDefaultSource(42), []float64{1, 2, 4, 8, 16, 32, 64})
 				expectedResponse := model.NewNoise(tc.PresetName)
 				expectedResponse.Generate(params.From, params.To, params.Resolution, noiseFunction)
 
