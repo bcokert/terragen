@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/bcokert/terragen/math"
-	"github.com/bcokert/terragen/testutils"
 )
 
 func TestDampCubicEase(t *testing.T) {
@@ -31,7 +30,7 @@ func TestDampCubicEase(t *testing.T) {
 	}
 
 	for name, testCase := range testCases {
-		if result := math.DampCubicEase(testCase.Input); !testutils.IsFloatEqual(testCase.Expected, result) {
+		if result := math.DampCubicEase(testCase.Input); !math.IsFloatEqual(testCase.Expected, result) {
 			t.Errorf("%s failed. Expected %v, received %v.", name, testCase.Expected, result)
 		}
 	}
@@ -61,7 +60,7 @@ func TestLinearEase(t *testing.T) {
 	}
 
 	for name, testCase := range testCases {
-		if result := math.LinearEase(testCase.Input); !testutils.IsFloatEqual(testCase.Expected, result) {
+		if result := math.LinearEase(testCase.Input); !math.IsFloatEqual(testCase.Expected, result) {
 			t.Errorf("%s failed. Expected %v, received %v.", name, testCase.Expected, result)
 		}
 	}

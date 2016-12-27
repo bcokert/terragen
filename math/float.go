@@ -1,8 +1,6 @@
-package testutils
+package math
 
-import (
-	"math"
-)
+import "math"
 
 // IsFloatEqual compares two floats to see if they're close enough to be considered equal
 func IsFloatEqual(a, b float64) bool {

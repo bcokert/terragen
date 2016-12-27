@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	tgmath "github.com/bcokert/terragen/math"
-	"github.com/bcokert/terragen/testutils"
 )
 
 func TestNewDefaultSource(t *testing.T) {
@@ -21,7 +20,7 @@ func TestNewDefaultSource(t *testing.T) {
 
 	for name, testCase := range testCases {
 		for i := 0; i < 10; i++ {
-			if !testutils.IsFloatEqual(testCase.Source.Float64(), testCase.Expected.Float64()) {
+			if !tgmath.IsFloatEqual(testCase.Source.Float64(), testCase.Expected.Float64()) {
 				t.Errorf("'%s' failed on iteration %d.", name, i)
 			}
 		}

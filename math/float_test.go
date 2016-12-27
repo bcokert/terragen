@@ -1,9 +1,9 @@
-package testutils_test
+package math_test
 
 import (
 	"testing"
 
-	"github.com/bcokert/terragen/testutils"
+	"github.com/bcokert/terragen/math"
 )
 
 func TestIsFloatEqual(t *testing.T) {
@@ -29,7 +29,7 @@ func TestIsFloatEqual(t *testing.T) {
 	}
 
 	for name, testCase := range testCases {
-		result := testutils.IsFloatEqual(testCase.A, testCase.B)
+		result := math.IsFloatEqual(testCase.A, testCase.B)
 		if result != testCase.Expected {
 			t.Errorf("'%s' failed. Expected %v, received %v", name, testCase.Expected, result)
 		}
