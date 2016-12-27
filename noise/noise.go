@@ -1,9 +1,7 @@
-package model
+package noise
 
 import (
 	"math"
-
-	"github.com/bcokert/terragen/noise"
 )
 
 // Noise represents generated noise, typically from GetNoise
@@ -23,7 +21,7 @@ func NewNoise(noiseFunction string) *Noise {
 }
 
 // Generate populates the RawNoise and related fields of this noise, by iterating over the range and calling the given noise function
-func (noise *Noise) Generate(from, to []int, resolution int, noiseFunction noise.Function) {
+func (noise *Noise) Generate(from, to []int, resolution int, noiseFunction Function) {
 	noise.Values = []float64{}
 
 	// initialize storage for parameters and values

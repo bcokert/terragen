@@ -1,16 +1,14 @@
-package transformer
+package noise
 
 import (
 	"math"
-
-	"github.com/bcokert/terragen/noise"
 )
 
 // A Transformer transforms a noise function into a new one, at the given frequency
-type Transformer func(fn noise.Function, freq float64) noise.Function
+type Transformer func(fn Function, freq float64) Function
 
 // Sinusoid transforms a noise function into a phase shifted sinusoid, at the specified frequency
-func Sinusoid(phaseFn noise.Function, freq float64) noise.Function {
+func Sinusoid(phaseFn Function, freq float64) Function {
 	phase := phaseFn([]float64{})
 	return func(t []float64) float64 {
 		product := 1.0

@@ -1,14 +1,13 @@
-package generator
+package noise
 
 import (
 	"math"
 
 	tgmath "github.com/bcokert/terragen/math"
-	"github.com/bcokert/terragen/noise"
 )
 
 // Random Builds a noise function that returns random floats in the range [0, 1]
-func Random(random tgmath.Source) noise.Function {
+func Random(random tgmath.Source) Function {
 	return func(t []float64) float64 {
 		return random.Float64()
 	}
@@ -16,7 +15,7 @@ func Random(random tgmath.Source) noise.Function {
 
 // Perlin builds a noise function that returns Lattice Gradient noise values as described by Ken Perlin
 // TODO: Handle other dimensions than 2
-func Perlin(cache tgmath.GridCache, interpolator tgmath.Interpolator) noise.Function {
+func Perlin(cache tgmath.GridCache, interpolator tgmath.Interpolator) Function {
 	return func(t []float64) float64 {
 		//log.Debug("Calculating perlin noise at %v %v", t[0], t[1])
 

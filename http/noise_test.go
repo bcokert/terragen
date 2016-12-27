@@ -12,8 +12,7 @@ import (
 
 	tghttp "github.com/bcokert/terragen/http"
 	"github.com/bcokert/terragen/math"
-	"github.com/bcokert/terragen/model"
-	"github.com/bcokert/terragen/presets"
+	"github.com/bcokert/terragen/noise"
 )
 
 func TestHandleNoise(t *testing.T) {
@@ -23,109 +22,109 @@ func TestHandleNoise(t *testing.T) {
 		Resolution               string
 		Preset                   string
 		Seed                     string
-		ExpectedPresetCollection map[string]presets.Preset // TODO: remove when noise composition refactor is done
+		ExpectedPresetCollection map[string]noise.Preset // TODO: remove when noise composition refactor is done
 		ExpectedStatusCode       int
 		ExpectedErrorBody        string
 	}{
 		"Default from": {
 			From: "", To: "3,2", Resolution: "5", Preset: "red", Seed: "922",
-			ExpectedPresetCollection: presets.SpectralPresets,
+			ExpectedPresetCollection: noise.SpectralPresets,
 			ExpectedStatusCode:       http.StatusOK,
 			ExpectedErrorBody:        "",
 		},
 		"Default to": {
 			From: "1,2", To: "", Resolution: "3", Preset: "blue", Seed: "123",
-			ExpectedPresetCollection: presets.SpectralPresets,
+			ExpectedPresetCollection: noise.SpectralPresets,
 			ExpectedStatusCode:       http.StatusOK,
 			ExpectedErrorBody:        "",
 		},
 		"Default resolution": {
 			From: "1", To: "10", Resolution: "", Preset: "white", Seed: "34",
-			ExpectedPresetCollection: presets.SpectralPresets,
+			ExpectedPresetCollection: noise.SpectralPresets,
 			ExpectedStatusCode:       http.StatusOK,
 			ExpectedErrorBody:        "",
 		},
 		"Default preset": {
 			From: "1", To: "3", Resolution: "20", Preset: "", Seed: "9999",
-			ExpectedPresetCollection: presets.SpectralPresets,
+			ExpectedPresetCollection: noise.SpectralPresets,
 			ExpectedStatusCode:       http.StatusOK,
 			ExpectedErrorBody:        "",
 		},
 		"All Defaults except seed": {
 			From: "", To: "", Resolution: "", Preset: "", Seed: "64326",
-			ExpectedPresetCollection: presets.SpectralPresets,
+			ExpectedPresetCollection: noise.SpectralPresets,
 			ExpectedStatusCode:       http.StatusOK,
 			ExpectedErrorBody:        "",
 		},
 		"All set": {
 			From: "0,2", To: "4,5", Resolution: "12", Preset: "rawPerlin", Seed: "62346236236",
-			ExpectedPresetCollection: presets.LatticePresets,
+			ExpectedPresetCollection: noise.LatticePresets,
 			ExpectedStatusCode:       http.StatusOK,
 			ExpectedErrorBody:        "",
 		},
 		"Illegal from": {
 			From: "52,banana", To: "12", Resolution: "14", Preset: "white", Seed: "162",
-			ExpectedPresetCollection: presets.SpectralPresets,
+			ExpectedPresetCollection: noise.SpectralPresets,
 			ExpectedStatusCode:       http.StatusBadRequest,
 			ExpectedErrorBody:        `{"error": "Invalid param: (From must be an array of integers)"}`,
 		},
 		"Float from": {
 			From: "52.32", To: "12", Resolution: "14", Preset: "white", Seed: "162",
-			ExpectedPresetCollection: presets.SpectralPresets,
+			ExpectedPresetCollection: noise.SpectralPresets,
 			ExpectedStatusCode:       http.StatusBadRequest,
 			ExpectedErrorBody:        `{"error": "Invalid param: (From must be an array of integers)"}`,
 		},
 		"illegal to": {
 			From: "15", To: "52,banana", Resolution: "14", Preset: "white", Seed: "56",
-			ExpectedPresetCollection: presets.SpectralPresets,
+			ExpectedPresetCollection: noise.SpectralPresets,
 			ExpectedStatusCode:       http.StatusBadRequest,
 			ExpectedErrorBody:        `{"error": "Invalid param: (To must be an array of integers)"}`,
 		},
 		"float to": {
 			From: "15", To: "52.6", Resolution: "14", Preset: "white", Seed: "56",
-			ExpectedPresetCollection: presets.SpectralPresets,
+			ExpectedPresetCollection: noise.SpectralPresets,
 			ExpectedStatusCode:       http.StatusBadRequest,
 			ExpectedErrorBody:        `{"error": "Invalid param: (To must be an array of integers)"}`,
 		},
 		"from and to diff lengths": {
 			From: "15", To: "52,77", Resolution: "14", Preset: "white", Seed: "56",
-			ExpectedPresetCollection: presets.SpectralPresets,
+			ExpectedPresetCollection: noise.SpectralPresets,
 			ExpectedStatusCode:       http.StatusBadRequest,
 			ExpectedErrorBody:        `{"error": "Invalid param: (From and To must be the same length)"}`,
 		},
 		"from greater than to": {
 			From: "15", To: "7", Resolution: "14", Preset: "white", Seed: "56",
-			ExpectedPresetCollection: presets.SpectralPresets,
+			ExpectedPresetCollection: noise.SpectralPresets,
 			ExpectedStatusCode:       http.StatusBadRequest,
 			ExpectedErrorBody:        `{"error": "Invalid param: (The value of To must be greater than the value of From in each dimension)"}`,
 		},
 		"from equals to": {
 			From: "7", To: "7", Resolution: "14", Preset: "white", Seed: "56",
-			ExpectedPresetCollection: presets.SpectralPresets,
+			ExpectedPresetCollection: noise.SpectralPresets,
 			ExpectedStatusCode:       http.StatusBadRequest,
 			ExpectedErrorBody:        `{"error": "Invalid param: (The value of To must be greater than the value of From in each dimension)"}`,
 		},
 		"illegal resolution": {
 			From: "7", To: "11", Resolution: "14x15", Preset: "white", Seed: "56",
-			ExpectedPresetCollection: presets.SpectralPresets,
+			ExpectedPresetCollection: noise.SpectralPresets,
 			ExpectedStatusCode:       http.StatusBadRequest,
 			ExpectedErrorBody:        `{"error": "Invalid param: (Resolution must be a positive integer)"}`,
 		},
 		"resolution too small": {
 			From: "7", To: "11", Resolution: "0", Preset: "white", Seed: "56",
-			ExpectedPresetCollection: presets.SpectralPresets,
+			ExpectedPresetCollection: noise.SpectralPresets,
 			ExpectedStatusCode:       http.StatusBadRequest,
 			ExpectedErrorBody:        `{"error": "Invalid param: (Resolution must be a positive integer)"}`,
 		},
 		"invalid noise function": {
 			From: "7", To: "11", Resolution: "5", Preset: "ae1234", Seed: "56",
-			ExpectedPresetCollection: presets.SpectralPresets,
+			ExpectedPresetCollection: noise.SpectralPresets,
 			ExpectedStatusCode:       http.StatusBadRequest,
 			ExpectedErrorBody:        `{"error": "Invalid param: (NoiseFunction must be a valid preset)"}`,
 		},
 		"invalid seed": {
 			From: "7", To: "11", Resolution: "5", Preset: "white", Seed: "banana",
-			ExpectedPresetCollection: presets.SpectralPresets,
+			ExpectedPresetCollection: noise.SpectralPresets,
 			ExpectedStatusCode:       http.StatusBadRequest,
 			ExpectedErrorBody:        `{"error": "Invalid param: (Seed must be a positive integer)"}`,
 		},
@@ -163,7 +162,7 @@ func TestHandleNoise(t *testing.T) {
 		resolution := 20
 		var seed int64
 		presetName := "red"
-		var preset presets.Preset
+		var preset noise.Preset
 		var err error
 		var ok bool
 
@@ -196,10 +195,10 @@ func TestHandleNoise(t *testing.T) {
 		}
 
 		noiseFunction := preset(math.NewDefaultSource(seed), []float64{1, 2, 4, 8, 16, 32, 64})
-		expectedResponse := model.NewNoise(presetName)
+		expectedResponse := noise.NewNoise(presetName)
 		expectedResponse.Generate(from, to, resolution, noiseFunction)
 
-		responseObject := model.Noise{}
+		responseObject := noise.Noise{}
 		if err := json.NewDecoder(w.Body).Decode(&responseObject); err != nil {
 			t.Errorf("'%s' failed. Failed to decode response: %s", name, w.Body.String())
 			continue
@@ -215,14 +214,14 @@ func TestHandleNoise_Permutations(t *testing.T) {
 	testCases := map[string]struct {
 		PresetName       string
 		Dimensions       []int
-		PresetCollection map[string]presets.Preset
+		PresetCollection map[string]noise.Preset
 	}{
-		"violet":    {PresetName: "violet", Dimensions: []int{1, 2}, PresetCollection: presets.SpectralPresets},
-		"blue":      {PresetName: "blue", Dimensions: []int{1, 2}, PresetCollection: presets.SpectralPresets},
-		"white":     {PresetName: "white", Dimensions: []int{1, 2}, PresetCollection: presets.SpectralPresets},
-		"pink":      {PresetName: "pink", Dimensions: []int{1, 2}, PresetCollection: presets.SpectralPresets},
-		"red":       {PresetName: "red", Dimensions: []int{1, 2}, PresetCollection: presets.SpectralPresets},
-		"rawPerlin": {PresetName: "rawPerlin", Dimensions: []int{2}, PresetCollection: presets.LatticePresets},
+		"violet":    {PresetName: "violet", Dimensions: []int{1, 2}, PresetCollection: noise.SpectralPresets},
+		"blue":      {PresetName: "blue", Dimensions: []int{1, 2}, PresetCollection: noise.SpectralPresets},
+		"white":     {PresetName: "white", Dimensions: []int{1, 2}, PresetCollection: noise.SpectralPresets},
+		"pink":      {PresetName: "pink", Dimensions: []int{1, 2}, PresetCollection: noise.SpectralPresets},
+		"red":       {PresetName: "red", Dimensions: []int{1, 2}, PresetCollection: noise.SpectralPresets},
+		"rawPerlin": {PresetName: "rawPerlin", Dimensions: []int{2}, PresetCollection: noise.LatticePresets},
 	}
 
 	// For each preset, for each dimension, we have a set of test cases (aka sets of params)
@@ -269,10 +268,10 @@ func TestHandleNoise_Permutations(t *testing.T) {
 				handler(w, r, nil)
 
 				noiseFunction := tc.PresetCollection[tc.PresetName](math.NewDefaultSource(42), []float64{1, 2, 4, 8, 16, 32, 64})
-				expectedResponse := model.NewNoise(tc.PresetName)
+				expectedResponse := noise.NewNoise(tc.PresetName)
 				expectedResponse.Generate(params.From, params.To, params.Resolution, noiseFunction)
 
-				responseObject := model.Noise{}
+				responseObject := noise.Noise{}
 				if w.Code != http.StatusOK {
 					t.Errorf("%s failed with param set %d. Expected code %d, received %d", name, i, http.StatusOK, w.Code)
 					t.Logf("Response: %s", w.Body.String())

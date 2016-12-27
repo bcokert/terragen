@@ -1,20 +1,18 @@
-package synthesizer
-
-import "github.com/bcokert/terragen/noise"
+package noise
 
 // A WeightFunction determines a weight for an octave given the frequency of the octave
 type WeightFunction func(freq float64) float64
 
 // A NoiseFunctionGenerator produces noise functions at the given frequency
 // It should take pre-constructed noise functions who's only remaining variable is the frequency
-type NoiseFunctionGenerator func(freq float64) noise.Function
+type NoiseFunctionGenerator func(freq float64) Function
 
 // A Synthesizer synthesizes noise functions from existing noise functions at different frequencies and weights
-type Synthesizer func(fnGenerator NoiseFunctionGenerator, weightFn WeightFunction, frequencies []float64) noise.Function
+type Synthesizer func(fnGenerator NoiseFunctionGenerator, weightFn WeightFunction, frequencies []float64) Function
 
 // Octave synthesizes noise functions by linearly combining source noise functions
-func Octave(noiseFnGenerator NoiseFunctionGenerator, weightFn WeightFunction, frequencies []float64) noise.Function {
-	var noiseFunctions []noise.Function
+func Octave(noiseFnGenerator NoiseFunctionGenerator, weightFn WeightFunction, frequencies []float64) Function {
+	var noiseFunctions []Function
 	for _, freq := range frequencies {
 		freqFn := noiseFnGenerator(freq)
 		weight := weightFn(freq)

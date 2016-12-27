@@ -6,9 +6,9 @@ import (
 	"github.com/bcokert/terragen/log"
 )
 
-// Standard1DInputParams are used to verify equality of 1D noise functions
+// standard1DInputParams are used to verify equality of 1D noise functions
 // They're helpful for various testing of noise functions
-var Standard1DInputParams = [][]float64{
+var standard1DInputParams = [][]float64{
 	[]float64{-5400},
 	[]float64{-342.612},
 	[]float64{-1},
@@ -23,9 +23,9 @@ var Standard1DInputParams = [][]float64{
 	[]float64{99875},
 }
 
-// Standard2DInputParams are used to verify equality of 2D noise functions
+// standard2DInputParams are used to verify equality of 2D noise functions
 // They're helpful for various testing of noise functions
-var Standard2DInputParams = [][]float64{
+var standard2DInputParams = [][]float64{
 	[]float64{-52345, -13.45},
 	[]float64{-1, -1},
 	[]float64{-1, 0},
@@ -46,9 +46,9 @@ func (leftFn Function) IsEqual(rightFn Function, dimensions int) bool {
 	var dimensionParams [][]float64
 	switch dimensions {
 	case 1:
-		dimensionParams = Standard1DInputParams
+		dimensionParams = standard1DInputParams
 	case 2:
-		dimensionParams = Standard2DInputParams
+		dimensionParams = standard2DInputParams
 	default:
 		log.Debug("IsEqual called with an invalid dimension (%d). Returning false.", dimensions)
 		return false

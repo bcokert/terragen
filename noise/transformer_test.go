@@ -1,11 +1,10 @@
-package transformer_test
+package noise_test
 
 import (
 	"math"
 	"testing"
 
 	"github.com/bcokert/terragen/noise"
-	"github.com/bcokert/terragen/transformer"
 )
 
 func TestSinusoid(t *testing.T) {
@@ -38,7 +37,7 @@ func TestSinusoid(t *testing.T) {
 	}
 
 	for name, testCase := range testCases {
-		noiseFunction := transformer.Sinusoid(testCase.PhaseFn, testCase.Frequency)
+		noiseFunction := noise.Sinusoid(testCase.PhaseFn, testCase.Frequency)
 		if !noiseFunction.IsEqual(testCase.ExpectedFn, testCase.Dimension) {
 			t.Errorf("%s failed. Noise function did not equal expected function", name)
 		}

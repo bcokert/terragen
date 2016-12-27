@@ -11,8 +11,7 @@ import (
 
 	"github.com/bcokert/terragen/log"
 	"github.com/bcokert/terragen/math"
-	"github.com/bcokert/terragen/model"
-	"github.com/bcokert/terragen/presets"
+	"github.com/bcokert/terragen/noise"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -29,7 +28,7 @@ func HandleNoise() httprouter.Handle {
 
 		// Generate noise from the given params and preset
 		log.Info("Generating noise with the following params: %+v", params)
-		noise := model.NewNoise(params.presetName)
+		noise := noise.NewNoise(params.presetName)
 		noiseFn := params.preset(math.NewDefaultSource(params.seed), []float64{1, 2, 4, 8, 16, 32, 64})
 		noise.Generate(params.from, params.to, params.resolution, noiseFn)
 
@@ -42,7 +41,7 @@ type queryParams struct {
 	to         []int
 	resolution int
 	presetName string
-	preset     presets.Preset
+	preset     noise.Preset
 	seed       int64
 }
 
@@ -113,14 +112,14 @@ func validateNoiseParams(params url.Values) (response queryParams, err error) {
 }
 
 // search through each preset collection for the specified preset
-func searchPresets(name string) presets.Preset {
-	for noiseFn, preset := range presets.SpectralPresets {
+func searchPresets(name string) noise.Preset {
+	for noiseFn, preset := range noise.SpectralPresets {
 		if name == noiseFn {
 			return preset
 		}
 	}
 
-	for noiseFn, preset := range presets.LatticePresets {
+	for noiseFn, preset := range noise.LatticePresets {
 		if name == noiseFn {
 			return preset
 		}

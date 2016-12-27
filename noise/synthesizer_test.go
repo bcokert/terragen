@@ -1,16 +1,15 @@
-package synthesizer_test
+package noise_test
 
 import (
 	"testing"
 
 	"github.com/bcokert/terragen/noise"
-	"github.com/bcokert/terragen/synthesizer"
 )
 
 func TestOctave(t *testing.T) {
 	testCases := map[string]struct {
-		Generator      synthesizer.NoiseFunctionGenerator
-		WeightFunction synthesizer.WeightFunction
+		Generator      noise.NoiseFunctionGenerator
+		WeightFunction noise.WeightFunction
 		Frequencies    []float64
 		Dimension      int
 		ExpectedFn     noise.Function
@@ -78,7 +77,7 @@ func TestOctave(t *testing.T) {
 	}
 
 	for name, testCase := range testCases {
-		noiseFunction := synthesizer.Octave(testCase.Generator, testCase.WeightFunction, testCase.Frequencies)
+		noiseFunction := noise.Octave(testCase.Generator, testCase.WeightFunction, testCase.Frequencies)
 		if !noiseFunction.IsEqual(testCase.ExpectedFn, testCase.Dimension) {
 			t.Errorf("%s failed. Noise function did not equal expected function", name)
 		}

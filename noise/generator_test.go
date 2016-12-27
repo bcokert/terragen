@@ -1,11 +1,10 @@
-package generator_test
+package noise_test
 
 import (
 	"testing"
 
 	"math"
 
-	"github.com/bcokert/terragen/generator"
 	tgmath "github.com/bcokert/terragen/math"
 	"github.com/bcokert/terragen/noise"
 )
@@ -39,7 +38,7 @@ func TestRandom(t *testing.T) {
 	}
 
 	for name, testCase := range testCases {
-		noiseFunction := generator.Random(testCase.Source)
+		noiseFunction := noise.Random(testCase.Source)
 		if !noiseFunction.IsEqual(testCase.ExpectedFnCreator(), testCase.ExpectedDimension) {
 			t.Errorf("%s failed. Noise function did not equal expected function", name)
 		}
@@ -59,7 +58,7 @@ func TestPerlin(t *testing.T) {
 
 	for name, testCase := range testCases {
 
-		testNoiseFunction := generator.Perlin(testCase.Cache, testCase.Interpolator)
+		testNoiseFunction := noise.Perlin(testCase.Cache, testCase.Interpolator)
 		expectedNoiseFunction := func(input []float64) float64 {
 			a, b := input[0], input[1]
 

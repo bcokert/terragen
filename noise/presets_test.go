@@ -1,18 +1,14 @@
-package presets_test
+package noise_test
 
 import (
 	"math"
 	"testing"
 
-	"github.com/bcokert/terragen/generator"
 	tgmath "github.com/bcokert/terragen/math"
 	"github.com/bcokert/terragen/noise"
-	"github.com/bcokert/terragen/presets"
-	"github.com/bcokert/terragen/synthesizer"
-	"github.com/bcokert/terragen/transformer"
 )
 
-func testSpectralPreset(t *testing.T, preset presets.Preset, weightExponent float64) {
+func testSpectralPreset(t *testing.T, preset noise.Preset, weightExponent float64) {
 	testCases := map[string]struct {
 		Frequencies []float64
 		Dimensions  []int
@@ -28,14 +24,14 @@ func testSpectralPreset(t *testing.T, preset presets.Preset, weightExponent floa
 	}
 
 	for name, testCase := range testCases {
-		expectedGeneratorFn := generator.Random(tgmath.NewDefaultSource(42))
+		expectedGeneratorFn := noise.Random(tgmath.NewDefaultSource(42))
 		expectedNoiseFnGenerator := func(freq float64) noise.Function {
-			return transformer.Sinusoid(expectedGeneratorFn, freq)
+			return noise.Sinusoid(expectedGeneratorFn, freq)
 		}
 		expectedWeightFn := func(freq float64) float64 {
 			return math.Pow(freq, weightExponent)
 		}
-		expectedSynthesizerFn := synthesizer.Octave(expectedNoiseFnGenerator, expectedWeightFn, testCase.Frequencies)
+		expectedSynthesizerFn := noise.Octave(expectedNoiseFnGenerator, expectedWeightFn, testCase.Frequencies)
 
 		noiseFunction := preset(tgmath.NewDefaultSource(42), testCase.Frequencies)
 
@@ -48,23 +44,23 @@ func testSpectralPreset(t *testing.T, preset presets.Preset, weightExponent floa
 }
 
 func TestViolet(t *testing.T) {
-	testSpectralPreset(t, presets.Violet, 2)
+	testSpectralPreset(t, noise.Violet, 2)
 }
 
 func TestBlue(t *testing.T) {
-	testSpectralPreset(t, presets.Blue, 1)
+	testSpectralPreset(t, noise.Blue, 1)
 }
 
 func TestWhite(t *testing.T) {
-	testSpectralPreset(t, presets.White, 0)
+	testSpectralPreset(t, noise.White, 0)
 }
 
 func TestPink(t *testing.T) {
-	testSpectralPreset(t, presets.Pink, -1)
+	testSpectralPreset(t, noise.Pink, -1)
 }
 
 func TestRed(t *testing.T) {
-	testSpectralPreset(t, presets.Red, -2)
+	testSpectralPreset(t, noise.Red, -2)
 }
 
 func TestRawPerlin(t *testing.T) {
@@ -79,9 +75,9 @@ func TestRawPerlin(t *testing.T) {
 	for name, testCase := range testCases {
 		expectedCache := tgmath.NewDefaultRandomGridCache(tgmath.NewDefaultSource(42))
 		expectedInterpolator := tgmath.NewInterpolator(tgmath.DampCubicEase)
-		expectedGeneratorFn := generator.Perlin(expectedCache, expectedInterpolator)
+		expectedGeneratorFn := noise.Perlin(expectedCache, expectedInterpolator)
 
-		noiseFunction := presets.RawPerlin(tgmath.NewDefaultSource(42), testCase.Frequencies)
+		noiseFunction := noise.RawPerlin(tgmath.NewDefaultSource(42), testCase.Frequencies)
 
 		if !noiseFunction.IsEqual(expectedGeneratorFn, 2) {
 			t.Errorf("%s failed in dimension %d. Noise function did not equal expected function", name, 2)
